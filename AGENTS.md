@@ -1,0 +1,89 @@
+# AGENTS.md — LifeCompanion
+
+Guidance for AI coding assistants and automation navigating this repository.
+
+## Project snapshot
+
+- **What**: Android app **LifeCompanion** — Jetpack Compose UI, warranty tracking (local persistence + remote services), dashboard with exchange rates.
+- **Language**: Kotlin **2.3.x**, **Java 17** (source/target and toolchain).
+- **Build**: Gradle with **Kotlin DSL** (`*.gradle.kts`), **version catalog** at `gradle/libs.versions.toml`, `includeBuild("build-logic")` for shared convention code.
+- **Min/target SDK**: **API 36** (with minor API level 1 where used in `compileSdk` blocks). Do not assume lower API levels without checking.
+
+## Module map (dependency direction)
+
+```
+app
+├── design-system   (Compose UI primitives, theme, reusable components)
+├── domain          (models, repository interfaces, use cases)
+├── data:local      (Room, entities, DAOs, local repository impl, Koin `localModule`)
+└── data:remote     (Ktor/HTTP, MinIO, exchange API, Firebase Firestore, Koin `remoteModule`)
+```
+
+- **`domain`**: Pure Android library module; **no** Compose in domain by convention — keep UI out. Depends mainly on AndroidX core / coroutines as needed.
+- **`data:local`**: Depends on **`domain`**. Room **schemas** live under `data/local/schemas/` (Room `schemaDirectory`).
+- **`data:remote`**: Depends on **`domain`**. **BuildConfig** fields for exchange API and MinIO are injected from Gradle project properties (see [Secrets & local config](#secrets--local-config)).
+- **`design-system`**: Depends on **`domain`** for shared models where needed; exposes Compose + Material 3.
+- **`app`**: Wires everything: **`MainApplication`** starts **Koin** with `appModule` (includes coroutines, `localModule`, `remoteModule`, `viewModelModule`). Feature UI lives under `app/.../ui/`.
+
+When adding a feature, prefer: **domain** (contracts + use cases) → **data** (implementations) → **app** (screens/ViewModels) and reuse **`design-system`** for shared UI.
+
+## Package roots (where to look)
+
+| Module | Base package | Typical contents |
+|--------|----------------|------------------|
+| `app` | `com.mena97villalobos.lifecompanion` | `MainActivity`, `MainApplication`, `di/`, `ui/` (screens, `navigation/`, feature folders) |
+| `design-system` | `com.mena97villalobos.design_system` | `theme/`, `cards/`, `button/`, shared widgets |
+| `domain` | `com.mena97villalobos.domain` | `model/`, `repository/`, `usecases/`, `services/` (interfaces) |
+| `data:local` | `com.mena97villalobos.local` | `database/`, `dao/`, `entities/`, `repository/`, `mappers/`, `di/LocalModule.kt` |
+| `data:remote` | `com.mena97villalobos.remote` | `client/`, `services/`, `repository/`, `di/RemoteModule.kt` |
+
+## Architecture conventions
+
+- **DI**: [Koin](https://insert-koin.io/). App entry: `app/.../di/AppModule.kt` aggregates modules. Feature ViewModels are registered in `ViewModelModule.kt`; data layers expose `localModule` / `remoteModule`.
+- **UI**: [Jetpack Compose](https://developer.android.com/jetpack/compose) + **Navigation Compose**. Central graph: `app/.../ui/AppNavHost.kt`. Routes and bottom-nav metadata: `AppScreens` in `ui/navigation/AppScreens.kt`.
+- **Async**: Kotlin **Coroutines**; dispatchers abstracted via domain `DispatcherService` where used.
+- **Local DB**: **Room** (KSP-generated code under `data/local/build/generated/` — **do not edit**; edit entities/DAO/database classes in `src/main` only).
+- **Networking / cloud**: **Ktor** (Koin), **MinIO** client for object storage, **Firebase** (e.g. Crashlytics in app, Firestore in remote). Exchange rates: remote API + repository pattern in domain.
+
+## Build & quality
+
+- **Dependencies**: Add versions in `gradle/libs.versions.toml`, reference via `libs.*` in module `build.gradle.kts` files.
+- **Repositories**: `settings.gradle.kts` uses `FAIL_ON_PROJECT_REPOS`; declare repos only in the root settings file.
+- **Static analysis**: Detekt is set up via `build-logic` (`DetektConventionPlugin.kt`), config under **`.detekt/detekt-rules.yml`**, optional per-module **`detekt-baseline.xml`**. Compose-specific and ktlint-wrapper rules are on the classpath.
+- **Gradle performance**: Configuration cache and parallel builds enabled in `gradle.properties` — avoid patterns that break configuration cache unless you fix them.
+
+## Secrets & local config
+
+- **`data/remote`** expects Gradle `project` properties such as `exchangeBaseUrl`, `exchangeApiKey`, `minioEndpoint`, `minioEndpointAccessKey`, `minioEndpointSecretKey`, `minioBucketName` (see `data/remote/build.gradle.kts`). These may be supplied via **`gradle.properties`** (often gitignored for secrets) or **`local.properties`** — **never commit real API keys**.
+- **`google-services.json`** (Firebase) is required for Firebase-enabled builds; treat as environment-specific.
+
+## What to avoid
+
+- Do not hand-edit **KSP/Room generated** sources under `**/build/generated/**`.
+- Do not add **duplicate repository** declarations inside individual modules (root `settings.gradle.kts` owns this).
+- Prefer **small, focused changes** matching existing naming (`*Repository`, `*UseCase`, `*ViewModel`, `*Screen`).
+
+## Quick file index
+
+| Topic | Location |
+|-------|----------|
+| App + Koin bootstrap | `app/.../MainApplication.kt`, `app/.../di/AppModule.kt` |
+| Navigation | `app/.../ui/AppNavHost.kt`, `app/.../ui/navigation/AppScreens.kt` |
+| Version catalog | `gradle/libs.versions.toml` |
+| Module list | `settings.gradle.kts` |
+| Detekt | `.detekt/detekt-rules.yml`, `build-logic/convention/.../DetektConventionPlugin.kt` |
+
+## Suggested verification commands
+
+Run from the repo root (adjust if using a Gradle wrapper with a different invocation):
+
+```bash
+./gradlew :app:assembleDebug
+./gradlew detekt
+```
+
+If the wrapper is absent, use the system `gradle` with the same tasks.
+
+---
+
+*Update this file when modules, package names, or architectural rules change.*

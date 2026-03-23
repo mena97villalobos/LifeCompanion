@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "704106937094",
+    "project_id": "lifecompanion-473bc",
+    "storage_bucket": "lifecompanion-473bc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704106937094:android:4a7c1b41985b6d4c7b7c87",
+        "android_client_info": {
+          "package_name": "com.mena97villalobos.lifecompanion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCO0ctBiYya8ziOApmIN_8fFbZr2MOEHSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

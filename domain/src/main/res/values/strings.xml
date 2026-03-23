@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="usd_to_crc">USD to CRC</string>
+    <string name="crc_to_usd">CRC to USD</string>
+</resources>
