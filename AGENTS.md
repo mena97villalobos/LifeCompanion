@@ -50,6 +50,7 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 - **Dependencies**: Add versions in `gradle/libs.versions.toml`, reference via `libs.*` in module `build.gradle.kts` files.
 - **Repositories**: `settings.gradle.kts` uses `FAIL_ON_PROJECT_REPOS`; declare repos only in the root settings file.
 - **Static analysis**: Detekt is set up via `build-logic` (`DetektConventionPlugin.kt`), config under **`.detekt/detekt-rules.yml`**, optional per-module **`detekt-baseline.xml`**. Compose-specific and ktlint-wrapper rules are on the classpath.
+- **Kotlin Multiplatform + Compose Multiplatform (new modules)**: A build-logic convention plugin (`KotlinMultiplatformComposeConventionPlugin.kt`, id `com.mena97villalobos.lifecompanion.kotlin.multiplatform.compose.plugin`) applies **`org.jetbrains.kotlin.multiplatform`**, **`com.android.kotlin.multiplatform.library`** (required for KMP + Android on AGP 9+), **`org.jetbrains.compose`**, and **`org.jetbrains.kotlin.plugin.compose`** (same version as Kotlin in the catalog). Use it on a new module with `alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin)` in that module's `plugins { }` block, then add a **`kotlin { android { ... } }`** block, source sets (`commonMain`, `androidMain`, etc.), and dependencies as in the [Android KMP library plugin](https://developer.android.com/kotlin/multiplatform/plugin) and [Compose compiler (KMP)](https://kotlinlang.org/docs/multiplatform/compose-compiler.html) docs. Versions: **`composeMultiplatform`** and related plugin aliases live in `gradle/libs.versions.toml`; the root `build.gradle.kts` declares those plugins with `apply false` so Gradle can resolve them when the convention runs.
 - **Gradle performance**: Configuration cache and parallel builds enabled in `gradle.properties` — avoid patterns that break configuration cache unless you fix them.
 
 ## Secrets & local config
@@ -72,6 +73,7 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 | Version catalog | `gradle/libs.versions.toml` |
 | Module list | `settings.gradle.kts` |
 | Detekt | `.detekt/detekt-rules.yml`, `build-logic/convention/.../DetektConventionPlugin.kt` |
+| KMP + Compose MP (convention) | `build-logic/convention/.../KotlinMultiplatformComposeConventionPlugin.kt`, catalog `lifecompanion-kotlin-multiplatform-compose-plugin` |
 
 ## Suggested verification commands
 
