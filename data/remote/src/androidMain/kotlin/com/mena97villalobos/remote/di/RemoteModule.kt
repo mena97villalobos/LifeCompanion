@@ -9,7 +9,7 @@ import com.mena97villalobos.domain.usecases.GetSellRateUseCase
 import com.mena97villalobos.domain.usecases.GetWarrantiesUseCase
 import com.mena97villalobos.domain.usecases.UpdateWarrantyUseCase
 import com.mena97villalobos.domain.usecases.UploadWarrantyImageUseCase
-import com.mena97villalobos.remote.BuildConfig
+import com.mena97villalobos.remote.BuildKonfig
 import com.mena97villalobos.remote.client.provideHttpClient
 import com.mena97villalobos.remote.client.service.ExchangeRateApi
 import com.mena97villalobos.remote.repository.ExchangeRateRepositoryImpl
@@ -20,10 +20,10 @@ import org.koin.dsl.module
 internal val minioModule = module {
     single<MinioClient> {
         MinioClient.builder()
-            .endpoint(BuildConfig.MINIO_ENDPOINT)
+            .endpoint(BuildKonfig.MINIO_ENDPOINT)
             .credentials(
-                BuildConfig.MINIO_ENDPOINT_ACCESS_KEY,
-                BuildConfig.MINIO_ENDPOINT_SECRET_KEY,
+                BuildKonfig.MINIO_ENDPOINT_ACCESS_KEY,
+                BuildKonfig.MINIO_ENDPOINT_SECRET_KEY,
             )
             .build()
     }
@@ -33,7 +33,7 @@ internal val minioModule = module {
             dispatcherService = get(),
             context = get(),
             minioClient = get(),
-            bucketName = BuildConfig.MINIO_BUCKET_NAME,
+            bucketName = BuildKonfig.MINIO_BUCKET_NAME,
         )
     }
 }

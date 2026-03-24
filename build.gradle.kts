@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.lifecompanion.detekt.plugin) apply false
     alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin) apply false
+    alias(libs.plugins.buildkonfig) apply false
 }
 
 // Apply only on the root project so mergeDetektReports can wire subproject SARIF inputs.

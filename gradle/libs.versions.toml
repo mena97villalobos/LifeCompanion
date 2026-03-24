@@ -27,6 +27,7 @@ detektCompose = "0.5.6"
 detektKtlint = "2.0.0-alpha.2"
 jetbrainsKotlinJvm = "2.3.20"
 composeMultiplatform = "1.10.3"
+buildkonfig = "0.17.1"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -123,6 +124,7 @@ jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "composeMultip
 lifecompanion-detekt-plugin = { id = "com.mena97villalobos.lifecompanion.detekt.plugin" }
 lifecompanion-kotlin-multiplatform-compose-plugin = { id = "com.mena97villalobos.lifecompanion.kotlin.multiplatform.compose.plugin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 
 [bundles]
 compose = [
