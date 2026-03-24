@@ -6,6 +6,10 @@ plugins {
 }
 
 kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    iosX64()
+
     android {
         namespace = "com.mena97villalobos.domain"
         compileSdk {
