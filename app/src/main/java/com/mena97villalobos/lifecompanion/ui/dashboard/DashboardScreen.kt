@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -52,13 +51,13 @@ private fun DashboardContent(state: DashboardStatus.Success) {
         ExchangeRateCard(
             currentExchangeRate = state.sellExchangeRate.rate,
             previousExchangeRate = state.sellExchangeRate.previousRate,
-            indicatorLabel = stringResource(state.sellExchangeRate.indicator.textResource),
+            indicatorLabel = state.sellExchangeRate.indicator.displayName,
         )
 
         ExchangeRateCard(
             currentExchangeRate = state.buyExchangeRate.rate,
             previousExchangeRate = state.buyExchangeRate.previousRate,
-            indicatorLabel = stringResource(state.buyExchangeRate.indicator.textResource),
+            indicatorLabel = state.buyExchangeRate.indicator.displayName,
         )
     }
 }

@@ -19,8 +19,9 @@ class MinioServiceImpl(
     private val bucketName: String,
 ) : MinioService {
 
-    override suspend fun upload(uri: Uri): String = withContext(dispatcherService.io) {
+    override suspend fun upload(imageUri: String): String = withContext(dispatcherService.io) {
         val objectId = UUID.randomUUID().toString()
+        val uri = Uri.parse(imageUri)
 
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalStateException("Cannot open file")

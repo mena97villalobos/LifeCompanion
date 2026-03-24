@@ -1,6 +1,5 @@
 package com.mena97villalobos.local.repository
 
-import android.net.Uri
 import com.mena97villalobos.domain.model.Warranty
 import com.mena97villalobos.domain.repository.WarrantyRepository
 import com.mena97villalobos.domain.services.MinioService
@@ -25,5 +24,5 @@ class WarrantyRepositoryImpl(
 
     override suspend fun deleteWarranty(id: Long) = dao.delete(id)
 
-    override suspend fun uploadImage(uri: Uri): String = minioService.upload(uri)
+    override suspend fun uploadImage(imageUri: String): String = minioService.upload(imageUri)
 }
