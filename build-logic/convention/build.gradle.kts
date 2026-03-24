@@ -30,5 +30,10 @@ gradlePlugin {
             id = "com.mena97villalobos.lifecompanion.detekt.plugin"
             implementationClass = "com.mena97villalobos.convention.DetektConventionPlugin"
         }
+        create("lifecompanionKotlinMultiplatformCompose") {
+            id = "com.mena97villalobos.lifecompanion.kotlin.multiplatform.compose.plugin"
+            implementationClass =
+                "com.mena97villalobos.convention.KotlinMultiplatformComposeConventionPlugin"
+        }
     }
 }
