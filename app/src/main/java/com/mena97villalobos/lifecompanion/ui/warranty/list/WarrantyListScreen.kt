@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mena97villalobos.designsystem.cards.WarrantyCard
 import com.mena97villalobos.designsystem.search.WarrantySearchBar
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import org.koin.androidx.compose.koinViewModel
-import java.time.LocalDate
+import kotlin.time.Clock
 
 @Composable
 fun WarrantyListScreen(
@@ -27,7 +29,7 @@ fun WarrantyListScreen(
     viewModel: WarrantyListViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
-    val today = LocalDate.now()
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     val filtered = state.warranties.filter {
         it.description.contains(state.searchQuery, ignoreCase = true) ||
             it.storeName.contains(state.searchQuery, ignoreCase = true)

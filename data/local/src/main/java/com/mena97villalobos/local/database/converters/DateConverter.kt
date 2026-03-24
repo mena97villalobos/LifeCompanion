@@ -1,7 +1,7 @@
 package com.mena97villalobos.local.database.converters
 
 import androidx.room.TypeConverter
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 class DateConverter {
 

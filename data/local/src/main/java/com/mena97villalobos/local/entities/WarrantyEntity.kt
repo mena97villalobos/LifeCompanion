@@ -2,7 +2,7 @@ package com.mena97villalobos.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 @Entity(tableName = "warranties")
 data class WarrantyEntity(

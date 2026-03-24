@@ -13,8 +13,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import com.mena97villalobos.designsystem.imagepicker.ImagePicker
+import kotlinx.datetime.LocalDate
 import org.koin.androidx.compose.koinViewModel
-import java.time.LocalDate
 
 @Composable
 fun AddEditWarrantyScreen(

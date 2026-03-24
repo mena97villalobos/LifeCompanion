@@ -1,7 +1,10 @@
 package com.mena97villalobos.domain.model
 
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 data class Warranty(
     val id: Long?,
@@ -13,8 +16,10 @@ data class Warranty(
     val imageObjectId: String?,
 ) {
     val isExpired: Boolean
-        get() = LocalDate.now().isAfter(expiryDate)
+        get() = today() > expiryDate
 
     val daysUntilExpiry: Int
-        get() = ChronoUnit.DAYS.between(LocalDate.now(), expiryDate).toInt()
+        get() = today().daysUntil(expiryDate)
 }
+
+private fun today(): LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
