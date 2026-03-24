@@ -23,7 +23,7 @@ fun AppNavHost(
         startDestination = AppScreens.Home.route,
     ) {
         composable(AppScreens.Home.route) {
-            HomeScreen(navController)
+            HomeScreen()
         }
 
         composable(AppScreens.Dashboard.route) {
@@ -31,7 +31,7 @@ fun AppNavHost(
         }
 
         composable(AppScreens.Profile.route) {
-            HomeScreen(navController)
+            HomeScreen()
         }
 
         composable(AppScreens.WarrantyList.route) {
@@ -39,7 +39,9 @@ fun AppNavHost(
                 onAddClick = {
                     navController.navigate(AppScreens.AddWarranty.route)
                 },
-                onEditClick = {},
+                onEditClick = {
+                    navController.navigate(AppScreens.AddWarranty.route)
+                },
             )
         }
 

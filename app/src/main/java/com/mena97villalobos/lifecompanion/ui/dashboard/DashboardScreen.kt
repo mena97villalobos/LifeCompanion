@@ -24,6 +24,7 @@ import com.mena97villalobos.domain.model.ExchangeRate
 import com.mena97villalobos.domain.model.Indicator
 import org.koin.androidx.compose.koinViewModel
 
+@Suppress("UnusedParameter")
 @Composable
 fun DashboardScreen(
     navController: NavController,

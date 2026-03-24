@@ -1,6 +1,7 @@
 package com.mena97villalobos.domain.model
 
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 data class Warranty(
     val id: Long?,
@@ -15,5 +16,5 @@ data class Warranty(
         get() = LocalDate.now().isAfter(expiryDate)
 
     val daysUntilExpiry: Int
-        get() = LocalDate.now().until(expiryDate).days
+        get() = ChronoUnit.DAYS.between(LocalDate.now(), expiryDate).toInt()
 }
