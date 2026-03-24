@@ -16,6 +16,7 @@ googleServicesBom = "4.4.4"
 firebaseBom = "34.11.0"
 firebaseCrashlytics = "3.0.6"
 serializationJson = "1.10.0"
+kotlinxDatetime = "0.7.1"
 ktor = "3.4.1"
 junit = "4.13.2"
 androidxJunit = "1.3.0"
@@ -88,6 +89,7 @@ ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 

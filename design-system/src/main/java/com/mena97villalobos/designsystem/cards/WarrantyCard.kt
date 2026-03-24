@@ -25,8 +25,10 @@ import com.mena97villalobos.designsystem.R
 import com.mena97villalobos.designsystem.theme.NegativeColor
 import com.mena97villalobos.designsystem.theme.PositiveColor
 import com.mena97villalobos.domain.model.Warranty
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 @Composable
 fun WarrantyCard(
@@ -105,14 +107,15 @@ fun WarrantyCard(
 @Preview
 @Composable
 private fun PreviewWarrantyCard() = MaterialTheme {
+    val previewToday = Clock.System.todayIn(TimeZone.currentSystemDefault())
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.margin_2x))) {
         WarrantyCard(
             warranty = Warranty(
                 id = 1,
                 description = "Laptop Warranty",
                 storeName = "Best Buy",
-                purchaseDate = LocalDate.now(),
-                expiryDate = LocalDate.now(),
+                purchaseDate = previewToday,
+                expiryDate = previewToday,
                 notes = "Keep the receipt",
                 imageObjectId = null,
             ),
@@ -125,8 +128,8 @@ private fun PreviewWarrantyCard() = MaterialTheme {
                 id = 1,
                 description = "Laptop Warranty",
                 storeName = "Best Buy",
-                purchaseDate = LocalDate.now(),
-                expiryDate = LocalDate.now().minus(1, ChronoUnit.YEARS),
+                purchaseDate = previewToday,
+                expiryDate = LocalDate(2020, 1, 1),
                 notes = "Keep the receipt",
                 imageObjectId = null,
             ),
