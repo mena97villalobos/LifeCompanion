@@ -12,10 +12,14 @@ room {
 }
 
 ksp {
-    arg("room.schemaLocation", "${projectDir.absolutePath}/schemas")
+    arg("room.schemaLocation", layout.projectDirectory.dir("schemas").asFile.absolutePath)
 }
 
 kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    iosX64()
+
     android {
         namespace = "com.mena97villalobos.local"
         compileSdk {
@@ -44,12 +48,17 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
+        commonMain.dependencies {
             implementation(project(":domain"))
+            implementation(libs.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.core)
+        }
+
+        androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
-            implementation(libs.bundles.room)
             implementation(libs.bundles.koin)
-            implementation(libs.jetbrains.compose.runtime)
         }
 
         commonTest.dependencies {
@@ -68,5 +77,8 @@ kotlin {
 
 dependencies {
     add("androidMainImplementation", platform(libs.koin.bom))
-    ksp(libs.room.compiler)
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
 }

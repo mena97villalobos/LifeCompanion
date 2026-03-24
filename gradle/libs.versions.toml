@@ -10,6 +10,7 @@ coroutines = "1.10.2"
 appcompat = "1.7.1"
 material = "1.13.0"
 room = "2.8.4"
+sqlite = "2.6.2"
 ksp = "2.3.5"
 koinBom = "4.2.0"
 googleServicesBom = "4.4.4"
@@ -68,7 +69,8 @@ detekt-api = { module = "dev.detekt:detekt-api", version.ref = "detektVersion" }
 detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 detekt-ktlint-rules = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detektKtlint" }
 
-# Room
+# Room / SQLite (KMP)
+androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
@@ -76,7 +78,7 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 
 # Koin
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
-koin-core = { module = "io.insert-koin:koin-core" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinBom" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 koin-compose = { module = "io.insert-koin:koin-compose" }

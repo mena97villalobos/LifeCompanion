@@ -6,12 +6,11 @@ import com.mena97villalobos.local.database.LifeCompanionDatabase
 import com.mena97villalobos.local.database.getLifeCompanionDatabaseBuilder
 import com.mena97villalobos.local.database.getRoomDatabase
 import com.mena97villalobos.local.repository.WarrantyRepositoryImpl
-import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
-val localModule = module {
+val iosLocalModule = module {
     single<LifeCompanionDatabase> {
-        getRoomDatabase(getLifeCompanionDatabaseBuilder(androidContext()))
+        getRoomDatabase(getLifeCompanionDatabaseBuilder())
     }
     single<WarrantyDao> { get<LifeCompanionDatabase>().warrantyDao() }
     single<WarrantyRepository> { WarrantyRepositoryImpl(get(), get()) }
