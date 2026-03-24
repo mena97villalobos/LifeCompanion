@@ -27,3 +27,5 @@ local.properties
 /.idea/runConfigurations.xml
 /.idea/vcs.xml
 /.idea/artifacts/domain.xml
+/.idea/artifacts/local.xml
+/.idea/artifacts/remote.xml

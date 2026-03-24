@@ -1,6 +1,6 @@
 package com.mena97villalobos.remote.client
 
-import com.mena97villalobos.remote.BuildConfig
+import com.mena97villalobos.remote.BuildKonfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -29,16 +29,16 @@ fun provideHttpClient() = HttpClient(OkHttp) {
 
     install(Logging) {
         logger = Logger.ANDROID
-        level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
+        level = if (BuildKonfig.HTTP_LOGGING) LogLevel.ALL else LogLevel.NONE
         sanitizeHeader { header -> header == API_KEY_HEADER }
     }
 
     defaultRequest {
-        url(BuildConfig.EXCHANGE_API_ENDPOINT)
+        url(BuildKonfig.EXCHANGE_API_ENDPOINT)
 
         header(
             API_KEY_HEADER,
-            BuildConfig.EXCHANGE_API_KEY,
+            BuildKonfig.EXCHANGE_API_KEY,
         )
 
         contentType(ContentType.Application.Json)
