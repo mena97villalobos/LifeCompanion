@@ -13,6 +13,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -67,8 +68,16 @@ fun WarrantyCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                TextButton(onClick = onDelete) {
+                    Text(
+                        text = "Delete",
+                        color = NegativeColor,
+                    )
+                }
+
                 Surface(
                     shape = RoundedCornerShape(dimensionResource(R.dimen.radius_40)),
                     color = trendColor.copy(alpha = 0.12f),

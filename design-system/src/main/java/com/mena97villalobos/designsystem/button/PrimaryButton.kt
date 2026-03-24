@@ -34,6 +34,7 @@ import com.mena97villalobos.designsystem.core.TextColor
 import com.mena97villalobos.designsystem.core.conditional
 import com.mena97villalobos.designsystem.theme.Black30
 import com.mena97villalobos.designsystem.theme.Blue800
+import com.mena97villalobos.designsystem.theme.BrandPrimary
 import com.mena97villalobos.designsystem.theme.LifeCompanionTheme
 import com.mena97villalobos.designsystem.theme.typography
 
@@ -88,7 +89,7 @@ fun PrimaryButton(
                     if (buttonIconInfo?.iconAlignment == IconAlignment.START) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = buttonIconInfo.iconResId),
-                            tint = buttonIconInfo.iconColor ?: overrideTextColor?.color,
+                            tint = buttonIconInfo.iconColor ?: overrideTextColor?.color ?: BrandPrimary,
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(end = dimensionResource(id = R.dimen.margin_half))

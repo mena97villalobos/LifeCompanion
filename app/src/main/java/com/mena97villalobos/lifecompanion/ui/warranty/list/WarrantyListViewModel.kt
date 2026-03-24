@@ -41,9 +41,9 @@ class WarrantyListViewModel(
                 }
             }
 
-            is WarrantyListIntent.WarrantyClicked -> TODO()
+            is WarrantyListIntent.WarrantyClicked -> Unit
 
-            WarrantyListIntent.AddWarrantyClicked -> TODO()
+            WarrantyListIntent.AddWarrantyClicked -> Unit
         }
     }
 }

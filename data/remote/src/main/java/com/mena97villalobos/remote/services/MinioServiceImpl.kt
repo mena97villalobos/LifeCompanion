@@ -25,14 +25,16 @@ class MinioServiceImpl(
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw IllegalStateException("Cannot open file")
 
-        minioClient.putObject(
-            PutObjectArgs.builder()
-                .bucket(bucketName)
-                .`object`(objectId)
-                .stream(inputStream, -1, FILE_SIZE_PART)
-                .contentType(MIME_TYPE)
-                .build(),
-        )
+        inputStream.use { stream ->
+            minioClient.putObject(
+                PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .`object`(objectId)
+                    .stream(stream, -1, FILE_SIZE_PART)
+                    .contentType(MIME_TYPE)
+                    .build(),
+            )
+        }
 
         objectId
     }

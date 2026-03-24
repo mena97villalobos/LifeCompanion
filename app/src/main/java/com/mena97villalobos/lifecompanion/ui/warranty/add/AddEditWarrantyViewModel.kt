@@ -66,12 +66,24 @@ class AddEditWarrantyViewModel(
                 if (current.imageUri != null) {
                     imageObjectId = uploadImage(current.imageUri)
                 }
+                val purchaseDate = current.purchaseDate
+                val expiryDate = current.expiryDate
+                if (purchaseDate == null || expiryDate == null) {
+                    _state.update {
+                        it.copy(
+                            isSaving = false,
+                            error = "Please provide valid dates",
+                        )
+                    }
+                    return@launch
+                }
+
                 val warranty = Warranty(
                     id = current.id,
                     description = current.description,
                     storeName = current.storeName,
-                    purchaseDate = current.purchaseDate!!,
-                    expiryDate = current.expiryDate!!,
+                    purchaseDate = purchaseDate,
+                    expiryDate = expiryDate,
                     notes = current.notes,
                     imageObjectId = imageObjectId,
                 )
@@ -111,10 +123,10 @@ data class WarrantyFormState(
     val isEditMode: Boolean = false,
 ) {
     val isFormValid: Boolean
-        get() = description.isBlank() ||
-            storeName.isBlank() ||
-            purchaseDate == null ||
-            expiryDate == null
+        get() = description.isNotBlank() &&
+            storeName.isNotBlank() &&
+            purchaseDate != null &&
+            expiryDate != null
 }
 
 sealed class WarrantyFormIntent {
@@ -128,11 +140,11 @@ sealed class WarrantyFormIntent {
     ) : WarrantyFormIntent()
 
     data class PurchaseDateChanged(
-        val date: LocalDate,
+        val date: LocalDate?,
     ) : WarrantyFormIntent()
 
     data class ExpiryDateChanged(
-        val date: LocalDate,
+        val date: LocalDate?,
     ) : WarrantyFormIntent()
 
     data class NotesChanged(

@@ -20,11 +20,17 @@ class DashboardViewModel(
 
     init {
         viewModelScope.launch {
-            _uiState.update {
-                DashboardStatus.Success(
-                    getSellRateUseCase(),
-                    getBuyRateUseCase(),
-                )
+            try {
+                _uiState.update {
+                    DashboardStatus.Success(
+                        getSellRateUseCase(),
+                        getBuyRateUseCase(),
+                    )
+                }
+            } catch (_: Exception) {
+                _uiState.update {
+                    DashboardStatus.Error
+                }
             }
         }
     }
