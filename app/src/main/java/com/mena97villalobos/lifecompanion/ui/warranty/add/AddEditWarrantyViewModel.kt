@@ -64,7 +64,7 @@ class AddEditWarrantyViewModel(
             try {
                 var imageObjectId = current.imageObjectId
                 if (current.imageUri != null) {
-                    imageObjectId = uploadImage(current.imageUri)
+                    imageObjectId = uploadImage(current.imageUri.toString())
                 }
                 val purchaseDate = current.purchaseDate
                 val expiryDate = current.expiryDate

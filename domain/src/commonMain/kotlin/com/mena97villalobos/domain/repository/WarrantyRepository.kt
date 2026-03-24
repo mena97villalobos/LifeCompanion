@@ -1,6 +1,5 @@
 package com.mena97villalobos.domain.repository
 
-import android.net.Uri
 import com.mena97villalobos.domain.model.Warranty
 import kotlinx.coroutines.flow.Flow
 
@@ -14,5 +13,5 @@ interface WarrantyRepository {
 
     fun getAllWarranties(): Flow<List<Warranty>>
 
-    suspend fun uploadImage(uri: Uri): String
+    suspend fun uploadImage(imageUri: String): String
 }
