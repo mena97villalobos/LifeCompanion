@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin)
+    alias(libs.plugins.lifecompanion.kotlin.multiplatform.library.plugin)
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
@@ -41,7 +41,6 @@ kotlin {
         commonMain.dependencies {
             api(libs.kotlinx.datetime)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.jetbrains.compose.runtime)
         }
 
         commonTest.dependencies {

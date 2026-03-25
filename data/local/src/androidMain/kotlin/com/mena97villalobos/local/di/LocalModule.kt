@@ -10,6 +10,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val localModule = module {
+    includes(warrantyUseCaseModule)
     single<LifeCompanionDatabase> {
         getRoomDatabase(getLifeCompanionDatabaseBuilder(androidContext()))
     }
