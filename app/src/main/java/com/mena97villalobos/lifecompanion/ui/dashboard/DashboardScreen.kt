@@ -13,12 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mena97villalobos.designsystem.R
 import com.mena97villalobos.designsystem.cards.ExchangeRateCard
+import com.mena97villalobos.designsystem.tokens.DesignSystemDimens
 import com.mena97villalobos.domain.model.ExchangeRate
 import com.mena97villalobos.domain.model.Indicator
 import org.koin.androidx.compose.koinViewModel
@@ -44,7 +43,7 @@ private fun DashboardContent(state: DashboardStatus.Success) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.margin_2x)),
+            .padding(DesignSystemDimens.Margin2x),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
