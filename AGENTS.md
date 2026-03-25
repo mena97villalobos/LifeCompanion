@@ -15,13 +15,22 @@ Guidance for AI coding assistants and automation navigating this repository.
 app
 ├── design-system   (Compose UI primitives, theme, reusable components)
 ├── domain          (models, repository interfaces, use cases)
-├── data:local      (Room, entities, DAOs, local repository impl, Koin `localModule`)
+├── data:local      (Room, entities, DAOs, local repository impl, Koin `localModule` / `iosLocalModule`, warranty use cases)
 └── data:remote     (Ktor/HTTP, MinIO, exchange API; KMP Android+iOS — Koin `remoteModule` / `iosRemoteModule`)
 ```
 
-- **`domain`**: Kotlin Multiplatform library (Android + iOS targets); **no** feature UI in domain by convention. Provides `createDefaultDispatcherService()` for `DispatcherService`; hosts wire it in Koin. Depends on coroutines / datetime / Compose runtime in `commonMain`.
-- **`data:local`**: Depends on **`domain`**. Room **schemas** live under `data/local/schemas/` (Room `schemaDirectory`).
-- **`data:remote`**: Kotlin Multiplatform (Android + iOS). Depends on **`domain`**. **BuildKonfig** fields for exchange API and MinIO come from Gradle project properties (see [Secrets & local config](#secrets--local-config)). Android uses the JVM MinIO SDK; iOS uploads via Ktor + SigV4 (`MinioS3KtorService`). Wire **`iosRemoteModule`** on iOS hosts (with `DispatcherService`, `localModule`, etc.).
+- **`domain`**: Kotlin Multiplatform library (Android + iOS targets); **no** feature UI in domain by
+  convention. Provides `createDefaultDispatcherService()` for `DispatcherService`; hosts wire it in
+  Koin. Depends on coroutines and datetime in `commonMain`.
+- **`data:local`**: Depends on **`domain`**. Uses the KMP **library** convention (no Compose). Room
+  **schemas** live under `data/local/schemas/` (Room `schemaDirectory`).
+- **`data:remote`**: Kotlin Multiplatform (Android + iOS). Depends on **`domain`**. Uses the KMP *
+  *library** convention (no Compose). **BuildKonfig** fields for exchange API and MinIO come from
+  Gradle project properties (see [Secrets & local config](#secrets--local-config)). Android uses the
+  JVM MinIO SDK; iOS uploads via Ktor + SigV4 (`MinioS3KtorService`). An iOS app must start Koin
+  with the same graph as Android (see `MainApplication`): **`DispatcherService`** (
+  `createDefaultDispatcherService()`), **`iosLocalModule`** (includes DB, `WarrantyRepository`, and
+  **`warrantyUseCaseModule`**), and **`iosRemoteModule`**.
 - **`design-system`**: Depends on **`domain`** for shared models where needed; exposes Compose + Material 3.
 - **`app`**: Wires everything: **`MainApplication`** starts **Koin** with `appModule` (includes coroutines, `localModule`, `remoteModule`, `viewModelModule`). Feature UI lives under `app/.../ui/`.
 
@@ -29,13 +38,13 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 
 ## Package roots (where to look)
 
-| Module | Base package | Typical contents |
-|--------|----------------|------------------|
-| `app` | `com.mena97villalobos.lifecompanion` | `MainActivity`, `MainApplication`, `di/`, `ui/` (screens, `navigation/`, feature folders) |
-| `design-system` | `com.mena97villalobos.design_system` | `theme/`, `cards/`, `button/`, shared widgets |
-| `domain` | `com.mena97villalobos.domain` | `model/`, `repository/`, `usecases/`, `services/` (interfaces) |
-| `data:local` | `com.mena97villalobos.local` | `database/`, `dao/`, `entities/`, `repository/`, `mappers/`, `di/LocalModule.kt` |
-| `data:remote` | `com.mena97villalobos.remote` | `commonMain` (Ktor, exchange API, `remoteCoreModule`); `androidMain` (`RemoteModule`, MinIO JVM); `iosMain` (`iosRemoteModule`, Darwin engine) |
+| Module          | Base package                         | Typical contents                                                                                                                                    |
+|-----------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `app`           | `com.mena97villalobos.lifecompanion` | `MainActivity`, `MainApplication`, `di/`, `ui/` (screens, `navigation/`, feature folders)                                                           |
+| `design-system` | `com.mena97villalobos.design_system` | `theme/`, `cards/`, `button/`, shared widgets                                                                                                       |
+| `domain`        | `com.mena97villalobos.domain`        | `model/`, `repository/`, `usecases/`, `services/` (interfaces)                                                                                      |
+| `data:local`    | `com.mena97villalobos.local`         | `database/`, `dao/`, `entities/`, `repository/`, `mappers/`, `di/` (`LocalModule.kt`, `WarrantyUseCaseModule.kt`, `LocalModule.ios.kt`)             |
+| `data:remote`   | `com.mena97villalobos.remote`        | `commonMain` (Ktor, exchange API only: `remoteCoreModule`); `androidMain` (`RemoteModule`, MinIO JVM); `iosMain` (`iosRemoteModule`, Darwin engine) |
 
 ## Architecture conventions
 
@@ -51,6 +60,11 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 - **Repositories**: `settings.gradle.kts` uses `FAIL_ON_PROJECT_REPOS`; declare repos only in the root settings file.
 - **Static analysis**: Detekt is set up via `build-logic` (`DetektConventionPlugin.kt`), config under **`.detekt/detekt-rules.yml`**, optional per-module **`detekt-baseline.xml`**. Compose-specific and ktlint-wrapper rules are on the classpath.
 - **Kotlin Multiplatform + Compose Multiplatform (new modules)**: A build-logic convention plugin (`KotlinMultiplatformComposeConventionPlugin.kt`, id `com.mena97villalobos.lifecompanion.kotlin.multiplatform.compose.plugin`) applies **`org.jetbrains.kotlin.multiplatform`**, **`com.android.kotlin.multiplatform.library`** (required for KMP + Android on AGP 9+), **`org.jetbrains.compose`**, and **`org.jetbrains.kotlin.plugin.compose`** (same version as Kotlin in the catalog). Use it on a new module with `alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin)` in that module's `plugins { }` block, then add a **`kotlin { android { ... } }`** block, source sets (`commonMain`, `androidMain`, etc.), and dependencies as in the [Android KMP library plugin](https://developer.android.com/kotlin/multiplatform/plugin) and [Compose compiler (KMP)](https://kotlinlang.org/docs/multiplatform/compose-compiler.html) docs. Versions: **`composeMultiplatform`** and related plugin aliases live in `gradle/libs.versions.toml`; the root `build.gradle.kts` declares those plugins with `apply false` so Gradle can resolve them when the convention runs.
+- **Kotlin Multiplatform library without Compose**: **`domain`** and similar modules use
+  `KotlinMultiplatformLibraryConventionPlugin.kt` (id
+  `com.mena97villalobos.lifecompanion.kotlin.multiplatform.library.plugin`) — only *
+  *`org.jetbrains.kotlin.multiplatform`** and **`com.android.kotlin.multiplatform.library`**, so no
+  Compose runtime or compiler dependency is required.
 - **Gradle performance**: Configuration cache and parallel builds enabled in `gradle.properties` — avoid patterns that break configuration cache unless you fix them.
 
 ## Secrets & local config
@@ -66,14 +80,15 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 
 ## Quick file index
 
-| Topic | Location |
-|-------|----------|
-| App + Koin bootstrap | `app/.../MainApplication.kt`, `app/.../di/AppModule.kt` |
-| Navigation | `app/.../ui/AppNavHost.kt`, `app/.../ui/navigation/AppScreens.kt` |
-| Version catalog | `gradle/libs.versions.toml` |
-| Module list | `settings.gradle.kts` |
-| Detekt | `.detekt/detekt-rules.yml`, `build-logic/convention/.../DetektConventionPlugin.kt` |
+| Topic                         | Location                                                                                                                                |
+|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| App + Koin bootstrap          | `app/.../MainApplication.kt`, `app/.../di/AppModule.kt`                                                                                 |
+| Navigation                    | `app/.../ui/AppNavHost.kt`, `app/.../ui/navigation/AppScreens.kt`                                                                       |
+| Version catalog               | `gradle/libs.versions.toml`                                                                                                             |
+| Module list                   | `settings.gradle.kts`                                                                                                                   |
+| Detekt                        | `.detekt/detekt-rules.yml`, `build-logic/convention/.../DetektConventionPlugin.kt`                                                      |
 | KMP + Compose MP (convention) | `build-logic/convention/.../KotlinMultiplatformComposeConventionPlugin.kt`, catalog `lifecompanion-kotlin-multiplatform-compose-plugin` |
+| KMP library without Compose   | `build-logic/convention/.../KotlinMultiplatformLibraryConventionPlugin.kt`, catalog `lifecompanion-kotlin-multiplatform-library-plugin` |
 
 ## Suggested verification commands
 

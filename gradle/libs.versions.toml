@@ -126,6 +126,7 @@ jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "composeMultip
 # Plugins defined by this project
 lifecompanion-detekt-plugin = { id = "com.mena97villalobos.lifecompanion.detekt.plugin" }
 lifecompanion-kotlin-multiplatform-compose-plugin = { id = "com.mena97villalobos.lifecompanion.kotlin.multiplatform.compose.plugin" }
+lifecompanion-kotlin-multiplatform-library-plugin = { id = "com.mena97villalobos.lifecompanion.kotlin.multiplatform.library.plugin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 

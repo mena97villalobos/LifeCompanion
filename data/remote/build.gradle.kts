@@ -3,7 +3,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin)
+    alias(libs.plugins.lifecompanion.kotlin.multiplatform.library.plugin)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.lifecompanion.detekt.plugin)
@@ -82,7 +82,6 @@ kotlin {
             implementation(libs.minio)
             implementation(libs.bundles.koin)
             implementation(libs.bundles.koin.ktor)
-            implementation(libs.jetbrains.compose.runtime)
         }
 
         iosMain.dependencies {

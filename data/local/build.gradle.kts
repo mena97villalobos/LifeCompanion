@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin)
+    alias(libs.plugins.lifecompanion.kotlin.multiplatform.library.plugin)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
     alias(libs.plugins.lifecompanion.detekt.plugin)
