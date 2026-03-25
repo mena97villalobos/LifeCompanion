@@ -49,6 +49,10 @@ kotlin {
             implementation(libs.junit)
         }
 
+        androidMain.dependencies {
+            implementation(libs.jetbrains.coroutines)
+        }
+
         getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.androidx.junit)

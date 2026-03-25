@@ -16,12 +16,12 @@ app
 ├── design-system   (Compose UI primitives, theme, reusable components)
 ├── domain          (models, repository interfaces, use cases)
 ├── data:local      (Room, entities, DAOs, local repository impl, Koin `localModule`)
-└── data:remote     (Ktor/HTTP, MinIO, exchange API, Firebase Firestore, Koin `remoteModule`)
+└── data:remote     (Ktor/HTTP, MinIO, exchange API; KMP Android+iOS — Koin `remoteModule` / `iosRemoteModule`)
 ```
 
-- **`domain`**: Pure Android library module; **no** Compose in domain by convention — keep UI out. Depends mainly on AndroidX core / coroutines as needed.
+- **`domain`**: Kotlin Multiplatform library (Android + iOS targets); **no** feature UI in domain by convention. Provides `createDefaultDispatcherService()` for `DispatcherService`; hosts wire it in Koin. Depends on coroutines / datetime / Compose runtime in `commonMain`.
 - **`data:local`**: Depends on **`domain`**. Room **schemas** live under `data/local/schemas/` (Room `schemaDirectory`).
-- **`data:remote`**: Depends on **`domain`**. **BuildConfig** fields for exchange API and MinIO are injected from Gradle project properties (see [Secrets & local config](#secrets--local-config)).
+- **`data:remote`**: Kotlin Multiplatform (Android + iOS). Depends on **`domain`**. **BuildKonfig** fields for exchange API and MinIO come from Gradle project properties (see [Secrets & local config](#secrets--local-config)). Android uses the JVM MinIO SDK; iOS uploads via Ktor + SigV4 (`MinioS3KtorService`). Wire **`iosRemoteModule`** on iOS hosts (with `DispatcherService`, `localModule`, etc.).
 - **`design-system`**: Depends on **`domain`** for shared models where needed; exposes Compose + Material 3.
 - **`app`**: Wires everything: **`MainApplication`** starts **Koin** with `appModule` (includes coroutines, `localModule`, `remoteModule`, `viewModelModule`). Feature UI lives under `app/.../ui/`.
 
@@ -35,7 +35,7 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 | `design-system` | `com.mena97villalobos.design_system` | `theme/`, `cards/`, `button/`, shared widgets |
 | `domain` | `com.mena97villalobos.domain` | `model/`, `repository/`, `usecases/`, `services/` (interfaces) |
 | `data:local` | `com.mena97villalobos.local` | `database/`, `dao/`, `entities/`, `repository/`, `mappers/`, `di/LocalModule.kt` |
-| `data:remote` | `com.mena97villalobos.remote` | `client/`, `services/`, `repository/`, `di/RemoteModule.kt` |
+| `data:remote` | `com.mena97villalobos.remote` | `commonMain` (Ktor, exchange API, `remoteCoreModule`); `androidMain` (`RemoteModule`, MinIO JVM); `iosMain` (`iosRemoteModule`, Darwin engine) |
 
 ## Architecture conventions
 
@@ -43,7 +43,7 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 - **UI**: [Jetpack Compose](https://developer.android.com/jetpack/compose) + **Navigation Compose**. Central graph: `app/.../ui/AppNavHost.kt`. Routes and bottom-nav metadata: `AppScreens` in `ui/navigation/AppScreens.kt`.
 - **Async**: Kotlin **Coroutines**; dispatchers abstracted via domain `DispatcherService` where used.
 - **Local DB**: **Room** (KSP-generated code under `data/local/build/generated/` — **do not edit**; edit entities/DAO/database classes in `src/main` only).
-- **Networking / cloud**: **Ktor** (Koin), **MinIO** client for object storage, **Firebase** (e.g. Crashlytics in app, Firestore in remote). Exchange rates: remote API + repository pattern in domain.
+- **Networking / cloud**: **Ktor** (Koin), **MinIO** (JVM SDK on Android; S3 SigV4 + Ktor on iOS), **Firebase** in the app module where enabled. Exchange rates: remote API + repository pattern in domain.
 
 ## Build & quality
 

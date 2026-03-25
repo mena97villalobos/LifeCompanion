@@ -32,6 +32,10 @@ buildkonfig {
 }
 
 kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    iosX64()
+
     android {
         namespace = "com.mena97villalobos.remote"
         compileSdk {
@@ -60,17 +64,29 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
+        commonMain.dependencies {
             implementation(project(":domain"))
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.content.negotiation)
+            implementation(libs.ktor.serialization.json)
+            implementation(libs.ktor.logging)
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
+        }
 
-            implementation(libs.firebase.firestore)
+        androidMain.dependencies {
+            implementation(libs.ktor.okhttp)
             implementation(libs.androidx.core.ktx)
             implementation(libs.minio)
-
             implementation(libs.bundles.koin)
             implementation(libs.bundles.koin.ktor)
-
             implementation(libs.jetbrains.compose.runtime)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.darwin)
         }
 
         commonTest.dependencies {
@@ -88,6 +104,5 @@ kotlin {
 }
 
 dependencies {
-    add("androidMainImplementation", platform(libs.firebase.bom))
     add("androidMainImplementation", platform(libs.koin.bom))
 }
