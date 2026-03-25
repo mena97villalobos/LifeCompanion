@@ -31,7 +31,11 @@ app
   with the same graph as Android (see `MainApplication`): **`DispatcherService`** (
   `createDefaultDispatcherService()`), **`iosLocalModule`** (includes DB, `WarrantyRepository`, and
   **`warrantyUseCaseModule`**), and **`iosRemoteModule`**.
-- **`design-system`**: Depends on **`domain`** for shared models where needed; exposes Compose + Material 3.
+- **`design-system`**: Kotlin Multiplatform + **Compose Multiplatform** (same
+  `lifecompanion-kotlin-multiplatform-compose-plugin` convention as documented in this file).
+  Depends on **`domain`**; shared UI in **`commonMain`**, Android-specific pieces (e.g.
+  `ImagePicker`, `@Preview`) in **`androidMain`**, iOS theme actual in **`iosMain`**. Spacing/sizing
+  uses **`DesignSystemDimens`** tokens instead of Android `R.dimen`.
 - **`app`**: Wires everything: **`MainApplication`** starts **Koin** with `appModule` (includes coroutines, `localModule`, `remoteModule`, `viewModelModule`). Feature UI lives under `app/.../ui/`.
 
 When adding a feature, prefer: **domain** (contracts + use cases) → **data** (implementations) → **app** (screens/ViewModels) and reuse **`design-system`** for shared UI.
@@ -41,7 +45,7 @@ When adding a feature, prefer: **domain** (contracts + use cases) → **data** (
 | Module          | Base package                         | Typical contents                                                                                                                                    |
 |-----------------|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | `app`           | `com.mena97villalobos.lifecompanion` | `MainActivity`, `MainApplication`, `di/`, `ui/` (screens, `navigation/`, feature folders)                                                           |
-| `design-system` | `com.mena97villalobos.design_system` | `theme/`, `cards/`, `button/`, shared widgets                                                                                                       |
+| `design-system` | `com.mena97villalobos.designsystem`  | `commonMain` (`theme/`, `cards/`, `button/`, `tokens/`); `androidMain` (previews, `ImagePicker`); `iosMain` (theme actual)                          |
 | `domain`        | `com.mena97villalobos.domain`        | `model/`, `repository/`, `usecases/`, `services/` (interfaces)                                                                                      |
 | `data:local`    | `com.mena97villalobos.local`         | `database/`, `dao/`, `entities/`, `repository/`, `mappers/`, `di/` (`LocalModule.kt`, `WarrantyUseCaseModule.kt`, `LocalModule.ios.kt`)             |
 | `data:remote`   | `com.mena97villalobos.remote`        | `commonMain` (Ktor, exchange API only: `remoteCoreModule`); `androidMain` (`RemoteModule`, MinIO JVM); `iosMain` (`iosRemoteModule`, Darwin engine) |
