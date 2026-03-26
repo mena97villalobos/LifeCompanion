@@ -1,0 +1,23 @@
+# Install XcodeGen: brew install xcodegen
+# Then: cd iosApp && xcodegen generate && open LifeCompanion.xcodeproj
+# Before first run, build the Kotlin framework:
+#   ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
+# (Use linkDebugFrameworkIosArm64 for a physical device.)
+name: LifeCompanion
+options:
+  bundleIdPrefix: com.mena97villalobos
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    FRAMEWORK_SEARCH_PATHS: "$(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/debugFramework $(SRCROOT)/../composeApp/build/bin/iosArm64/debugFramework"
+    OTHER_LDFLAGS: "$(inherited) -framework ComposeApp"
+targets:
+  LifeCompanion:
+    type: application
+    platform: iOS
+    sources:
+      - path: LifeCompanion
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.mena97villalobos.lifecompanion.ios
+      INFOPLIST_FILE: LifeCompanion/Info.plist

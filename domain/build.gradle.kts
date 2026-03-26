@@ -1,51 +1,62 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.lifecompanion.kotlin.multiplatform.library.plugin)
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
-android {
-    namespace = "com.mena97villalobos.domain"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    iosX64()
 
-    defaultConfig {
+    android {
+        namespace = "com.mena97villalobos.domain"
+        compileSdk {
+            version = release(36) {
+                minorApiLevel = 1
+            }
+        }
         minSdk = 36
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
+        withHostTest {}
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-        debug {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+
+        optimization {
+            consumerKeepRules.apply {
+                publish = true
+                file("consumer-rules.pro")
+            }
+        }
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+    sourceSets {
+        commonMain.dependencies {
+            api(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.coroutines.core)
+        }
 
-dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.junit)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.jetbrains.coroutines)
+        }
+
+        getByName("androidDeviceTest") {
+            dependencies {
+                implementation(libs.androidx.junit)
+                implementation(libs.androidx.espresso.core)
+            }
+        }
+    }
 }

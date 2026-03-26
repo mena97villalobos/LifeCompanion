@@ -1,64 +1,80 @@
+@file:Suppress("DEPRECATION")
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.lifecompanion.kotlin.multiplatform.compose.plugin)
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
-android {
-    namespace = "com.mena97villalobos.designsystem"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    iosX64()
 
-    defaultConfig {
+    android {
+        namespace = "com.mena97villalobos.designsystem"
+        compileSdk {
+            version = release(36) {
+                minorApiLevel = 1
+            }
+        }
         minSdk = 36
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
+        withHostTest {}
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-        debug {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+
+        optimization {
+            consumerKeepRules.apply {
+                publish = true
+                file("consumer-rules.pro")
+            }
+        }
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
-    buildFeatures { compose = true }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    sourceSets {
+        commonMain.dependencies {
+            api(project(":domain"))
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(compose.materialIconsExtended)
+            implementation(libs.kotlinx.datetime)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.material)
+            implementation(libs.jetbrains.coroutines)
+            val composeVersion = libs.versions.composeMultiplatform.get()
+            implementation("org.jetbrains.compose.ui:ui-tooling:$composeVersion")
+            implementation("org.jetbrains.compose.ui:ui-tooling-preview:$composeVersion")
+        }
+
+        iosMain.dependencies {
+            // Foundation-backed formatters use platform APIs.
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.junit)
+        }
+
+        getByName("androidDeviceTest") {
+            dependencies {
+                implementation(libs.androidx.junit)
+                implementation(libs.androidx.espresso.core)
+            }
+        }
     }
-}
-
-dependencies {
-    implementation(project(":domain"))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.bundles.compose)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-    // Compose Testing
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

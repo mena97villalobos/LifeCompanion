@@ -1,9 +1,17 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.lifecompanion.kotlin.multiplatform.library.plugin)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.buildkonfig)
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
+// Required project properties (gradle.properties or local.properties):
+// exchangeBaseUrl, exchangeApiKey, minioEndpoint, minioEndpointAccessKey,
+// minioEndpointSecretKey, minioBucketName
 val exchangeBaseUrl: String by project
 val exchangeApiKey: String by project
 val minioEndpoint: String by project
@@ -11,80 +19,92 @@ val minioEndpointAccessKey: String by project
 val minioEndpointSecretKey: String by project
 val minioBucketName: String by project
 
-android {
-    namespace = "com.mena97villalobos.remote"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+val httpLoggingEnabled = findProperty("remote.http.logging")?.toString() == "true"
 
-    defaultConfig {
+buildkonfig {
+    packageName = "com.mena97villalobos.remote"
+    defaultConfigs {
+        buildConfigField(STRING, "EXCHANGE_API_ENDPOINT", exchangeBaseUrl)
+        buildConfigField(STRING, "EXCHANGE_API_KEY", exchangeApiKey)
+        buildConfigField(STRING, "MINIO_ENDPOINT", minioEndpoint)
+        buildConfigField(STRING, "MINIO_ENDPOINT_ACCESS_KEY", minioEndpointAccessKey)
+        buildConfigField(STRING, "MINIO_ENDPOINT_SECRET_KEY", minioEndpointSecretKey)
+        buildConfigField(STRING, "MINIO_BUCKET_NAME", minioBucketName)
+        buildConfigField(BOOLEAN, "HTTP_LOGGING", httpLoggingEnabled.toString())
+    }
+}
+
+kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    iosX64()
+
+    android {
+        namespace = "com.mena97villalobos.remote"
+        compileSdk {
+            version = release(36) {
+                minorApiLevel = 1
+            }
+        }
         minSdk = 36
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
+        withHostTest {}
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            buildConfigField("String", "EXCHANGE_API_ENDPOINT", "\"$exchangeBaseUrl\"")
-            buildConfigField("String", "EXCHANGE_API_KEY", "\"$exchangeApiKey\"")
-            buildConfigField("String", "MINIO_ENDPOINT", "\"$minioEndpoint\"")
-            buildConfigField("String", "MINIO_ENDPOINT_ACCESS_KEY", "\"$minioEndpointAccessKey\"")
-            buildConfigField("String", "MINIO_ENDPOINT_SECRET_KEY", "\"$minioEndpointSecretKey\"")
-            buildConfigField("String", "MINIO_BUCKET_NAME", "\"$minioBucketName\"")
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-        debug {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            buildConfigField("String", "EXCHANGE_API_ENDPOINT", "\"$exchangeBaseUrl\"")
-            buildConfigField("String", "EXCHANGE_API_KEY", "\"$exchangeApiKey\"")
-            buildConfigField("String", "MINIO_ENDPOINT", "\"$minioEndpoint\"")
-            buildConfigField("String", "MINIO_ENDPOINT_ACCESS_KEY", "\"$minioEndpointAccessKey\"")
-            buildConfigField("String", "MINIO_ENDPOINT_SECRET_KEY", "\"$minioEndpointSecretKey\"")
-            buildConfigField("String", "MINIO_BUCKET_NAME", "\"$minioBucketName\"")
+
+        optimization {
+            consumerKeepRules.apply {
+                publish = true
+                file("consumer-rules.pro")
+            }
+        }
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
-    buildFeatures {
-        buildConfig = true
-    }
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":domain"))
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.content.negotiation)
+            implementation(libs.ktor.serialization.json)
+            implementation(libs.ktor.logging)
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
+        }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+        androidMain.dependencies {
+            implementation(libs.ktor.okhttp)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.minio)
+            implementation(libs.bundles.koin)
+            implementation(libs.bundles.koin.ktor)
+        }
 
-    kotlin {
-        jvmToolchain(17)
+        iosMain.dependencies {
+            implementation(libs.ktor.darwin)
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.junit)
+        }
+
+        getByName("androidDeviceTest") {
+            dependencies {
+                implementation(libs.androidx.junit)
+                implementation(libs.androidx.espresso.core)
+            }
+        }
     }
 }
 
 dependencies {
-    implementation(project(":domain"))
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.minio)
-
-    // Koin + Ktor
-    implementation(platform(libs.koin.bom))
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.koin.ktor)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    add("androidMainImplementation", platform(libs.koin.bom))
 }
