@@ -52,8 +52,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":design-system"))
-    implementation(project(":domain"))
+    implementation(project(":composeApp"))
     implementation(project(":data:local"))
     implementation(project(":data:remote"))
 
@@ -62,11 +61,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity.compose)
 
-    implementation(libs.bundles.koin.ktor)
-
-    // Compose
+    // Compose (shell only; shared UI lives in :composeApp)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.bundles.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
 
     implementation(libs.jetbrains.coroutines)
 

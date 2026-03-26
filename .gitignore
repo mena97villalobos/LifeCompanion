@@ -1,15 +1,28 @@
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
 local.properties
+
+# Gradle/Kotlin
+.gradle/
+.kotlin/
+build/
+*/.kotlin/.*
+*.klib
+
+# Android/IDE artifacts
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Tooling/generated binaries
+prebuilds/fullsdk-linux
+prebuilds/fullsdk-darwin
+bin/
+out/
+
+# Xcode generated artifacts (project.yml is the source of truth)
+iosApp/LifeCompanion.xcodeproj/
+iosApp/**/*.xcworkspace/
+iosApp/**/xcuserdata/
+*.xcuserstate
