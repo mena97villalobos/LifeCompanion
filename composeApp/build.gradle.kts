@@ -76,6 +76,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.navigation)
+            implementation(libs.jetbrains.compose.ui.tooling.preview)
         }
 
         androidMain.dependencies {

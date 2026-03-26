@@ -37,6 +37,8 @@ object DesignSystemDimens {
     val ButtonProgressIndicatorStrokeWidth: Dp = 2.dp
 
     val ExchangeRateCardElevation: Dp = 6.dp
+    val ExchangeRateCardGap: Dp = 20.dp
+    val ExchangeRateCardMinWidth: Dp = 160.dp
     val ExchangeRateCardWidth: Dp = 190.dp
     val ExchangeRateCardHeight: Dp = 130.dp
 }
