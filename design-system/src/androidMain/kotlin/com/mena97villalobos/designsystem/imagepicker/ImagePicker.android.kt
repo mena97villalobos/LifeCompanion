@@ -5,10 +5,15 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.mena97villalobos.designsystem.PreviewDesignSystem
+import com.mena97villalobos.designsystem.theme.LifeCompanionTheme
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -64,4 +69,18 @@ fun saveBitmapToCache(
         "${context.packageName}.provider",
         file,
     )
+}
+
+@PreviewDesignSystem
+@Composable
+private fun PreviewImagePickerActions() {
+    LifeCompanionTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Preview the shared actions UI (not the platform launcher) for stability.
+            ImagePickerActions(
+                onCameraClick = {},
+                onGalleryClick = {},
+            )
+        }
+    }
 }
