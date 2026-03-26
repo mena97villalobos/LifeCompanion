@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/** Observes warranties, applies query filtering state, and handles delete intents. */
 class WarrantyListViewModel(
     private val getWarranties: GetWarrantiesUseCase,
     private val deleteWarranty: DeleteWarrantyUseCase,
@@ -55,6 +56,7 @@ data class WarrantyListState(
     val error: String? = null,
 )
 
+/** UI intents for warranty list interactions. */
 sealed class WarrantyListIntent {
     data class Search(val query: String) : WarrantyListIntent()
 
@@ -62,5 +64,5 @@ sealed class WarrantyListIntent {
 
     data class WarrantyClicked(val warrantyId: Long) : WarrantyListIntent()
 
-    object AddWarrantyClicked : WarrantyListIntent()
+    data object AddWarrantyClicked : WarrantyListIntent()
 }

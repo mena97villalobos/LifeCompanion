@@ -11,7 +11,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import org.koin.dsl.module
 
-/** Exchange HTTP client, API, repository, and rate use cases only. */
+/**
+ * Exchange HTTP client, API, [com.mena97villalobos.domain.repository.ExchangeRateRepository], and
+ * buy/sell rate use cases. Shared by Android `remoteModule` and iOS `iosRemoteModule`; it does not
+ * register MinIO (platform-specific modules add [com.mena97villalobos.domain.services.MinioService]).
+ */
 val remoteCoreModule = module {
     single<HttpClientEngine> { createHttpClientEngine() }
     single<HttpClient> { provideExchangeHttpClient(get()) }

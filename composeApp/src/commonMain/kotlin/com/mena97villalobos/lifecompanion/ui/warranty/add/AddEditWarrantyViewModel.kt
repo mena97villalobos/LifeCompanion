@@ -1,6 +1,5 @@
 package com.mena97villalobos.lifecompanion.ui.warranty.add
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mena97villalobos.domain.model.Warranty
@@ -14,6 +13,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
+/**
+ * Manages warranty form state for create/update flows.
+ *
+ * Save triggers image upload first (when a new `imageUri` is selected), then persists warranty data.
+ */
 class AddEditWarrantyViewModel(
     private val addWarranty: AddWarrantyUseCase,
     private val updateWarranty: UpdateWarrantyUseCase,
@@ -30,7 +34,7 @@ class AddEditWarrantyViewModel(
             is WarrantyFormIntent.PurchaseDateChanged -> _state.update { it.copy(purchaseDate = intent.date) }
             is WarrantyFormIntent.ExpiryDateChanged -> _state.update { it.copy(expiryDate = intent.date) }
             is WarrantyFormIntent.NotesChanged -> _state.update { it.copy(notes = intent.notes) }
-            is WarrantyFormIntent.ImageSelected -> _state.update { it.copy(imageUri = intent.uri) }
+            is WarrantyFormIntent.ImageSelected -> _state.update { it.copy(imageUri = intent.uriString) }
             WarrantyFormIntent.Save -> saveWarranty()
         }
     }
@@ -52,7 +56,7 @@ class AddEditWarrantyViewModel(
 
     private fun saveWarranty() {
         val current = _state.value
-        if (current.isFormValid.not()) {
+        if (!current.isFormValid) {
             _state.update {
                 it.copy(error = "Please fill all required fields")
             }
@@ -64,7 +68,7 @@ class AddEditWarrantyViewModel(
             try {
                 var imageObjectId = current.imageObjectId
                 if (current.imageUri != null) {
-                    imageObjectId = uploadImage(current.imageUri.toString())
+                    imageObjectId = uploadImage(current.imageUri)
                 }
                 val purchaseDate = current.purchaseDate
                 val expiryDate = current.expiryDate
@@ -116,19 +120,21 @@ data class WarrantyFormState(
     val purchaseDate: LocalDate? = null,
     val expiryDate: LocalDate? = null,
     val notes: String = "",
-    val imageUri: Uri? = null,
+    val imageUri: String? = null,
     val imageObjectId: String? = null,
     val isSaving: Boolean = false,
     val error: String? = null,
     val isEditMode: Boolean = false,
 ) {
+    /** True when required fields are present and dates are selected. */
     val isFormValid: Boolean
         get() = description.isNotBlank() &&
-            storeName.isNotBlank() &&
-            purchaseDate != null &&
-            expiryDate != null
+                storeName.isNotBlank() &&
+                purchaseDate != null &&
+                expiryDate != null
 }
 
+/** User intents emitted by the add/edit warranty screen. */
 sealed class WarrantyFormIntent {
 
     data class DescriptionChanged(
@@ -152,8 +158,8 @@ sealed class WarrantyFormIntent {
     ) : WarrantyFormIntent()
 
     data class ImageSelected(
-        val uri: Uri,
+        val uriString: String,
     ) : WarrantyFormIntent()
 
-    object Save : WarrantyFormIntent()
+    data object Save : WarrantyFormIntent()
 }

@@ -42,5 +42,6 @@ sealed class DashboardStatus {
         val sellExchangeRate: ExchangeRate,
         val buyExchangeRate: ExchangeRate,
     ) : DashboardStatus()
+
     data object Error : DashboardStatus()
 }

@@ -31,7 +31,7 @@ fun WarrantyCard(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val targetColor = if (warranty.isExpired.not()) PositiveColor else NegativeColor
+    val targetColor = if (!warranty.isExpired) PositiveColor else NegativeColor
     val trendColor by animateColorAsState(targetColor)
 
     Card(

@@ -6,6 +6,7 @@ import kotlinx.datetime.daysUntil
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
+/** Local warranty record with optional [imageObjectId] referencing object storage. */
 data class Warranty(
     val id: Long?,
     val description: String,

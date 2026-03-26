@@ -14,7 +14,10 @@ import platform.posix.memcpy
 class IosImageUriReader : ImageUriReader {
     override suspend fun read(imageUri: String): ByteArray = withContext(Dispatchers.Default) {
         val url: NSURL = when {
-            imageUri.startsWith("file://") || imageUri.startsWith("http://") || imageUri.startsWith("https://") ->
+            imageUri.startsWith("http://") || imageUri.startsWith("https://") ->
+                error("Remote URLs are not supported. Provide a local file URI/path: $imageUri")
+
+            imageUri.startsWith("file://") ->
                 requireNotNull(NSURL.URLWithString(imageUri)) { "Invalid image URI: $imageUri" }
             else -> NSURL.fileURLWithPath(imageUri)
         }

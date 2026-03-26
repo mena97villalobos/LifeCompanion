@@ -9,6 +9,9 @@ plugins {
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
+// Required project properties (gradle.properties or local.properties):
+// exchangeBaseUrl, exchangeApiKey, minioEndpoint, minioEndpointAccessKey,
+// minioEndpointSecretKey, minioBucketName
 val exchangeBaseUrl: String by project
 val exchangeApiKey: String by project
 val minioEndpoint: String by project

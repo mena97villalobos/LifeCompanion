@@ -5,24 +5,18 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 
 @Composable
-fun ImagePicker(
-    onSelectImage: (Uri) -> Unit,
-    modifier: Modifier = Modifier,
+actual fun ImagePicker(
+    onSelectImage: (String) -> Unit,
+    modifier: Modifier,
 ) {
     val context = LocalContext.current
     val cameraLauncher =
@@ -31,27 +25,21 @@ fun ImagePicker(
         ) { bitmap ->
             bitmap?.let {
                 val uri = saveBitmapToCache(context, it)
-                onSelectImage(uri)
+                onSelectImage(uri.toString())
             }
         }
     val galleryLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.GetContent(),
         ) { uri ->
-            uri?.let { onSelectImage(it) }
+            uri?.let { onSelectImage(it.toString()) }
         }
 
-    Row(modifier = modifier) {
-        Button(onClick = { cameraLauncher.launch(null) }) {
-            Text("Camera")
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Button(onClick = { galleryLauncher.launch("image/*") }) {
-            Text("Gallery")
-        }
-    }
+    ImagePickerActions(
+        onCameraClick = { cameraLauncher.launch(null) },
+        onGalleryClick = { galleryLauncher.launch("image/*") },
+        modifier = modifier,
+    )
 }
 
 fun saveBitmapToCache(

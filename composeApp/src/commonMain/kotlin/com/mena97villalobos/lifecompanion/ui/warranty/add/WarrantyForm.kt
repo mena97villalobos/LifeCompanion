@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import com.mena97villalobos.designsystem.imagepicker.ImagePicker
 import kotlinx.datetime.LocalDate
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AddEditWarrantyScreen(
@@ -32,8 +32,16 @@ private fun WarrantyForm(
     state: WarrantyFormState,
     onIntent: (WarrantyFormIntent) -> Unit,
 ) {
-    var purchaseDateText by rememberSaveable { mutableStateOf(state.purchaseDate?.toString().orEmpty()) }
-    var expiryDateText by rememberSaveable { mutableStateOf(state.expiryDate?.toString().orEmpty()) }
+    var purchaseDateText by rememberSaveable {
+        mutableStateOf(
+            state.purchaseDate?.toString().orEmpty()
+        )
+    }
+    var expiryDateText by rememberSaveable {
+        mutableStateOf(
+            state.expiryDate?.toString().orEmpty()
+        )
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
