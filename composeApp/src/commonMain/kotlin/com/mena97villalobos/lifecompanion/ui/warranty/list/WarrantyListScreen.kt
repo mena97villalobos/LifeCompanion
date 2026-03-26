@@ -17,10 +17,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mena97villalobos.designsystem.cards.WarrantyCard
 import com.mena97villalobos.designsystem.search.WarrantySearchBar
 import com.mena97villalobos.domain.model.Warranty
+import com.mena97villalobos.remote.BuildKonfig
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
+
+private fun resolveMinioImageUrl(
+    minioEndpoint: String,
+    bucketName: String,
+    objectId: String,
+): String {
+    val raw = minioEndpoint.trim()
+    val withScheme = if (!raw.contains("://")) "http://$raw" else raw
+    val prefix = withScheme.trimEnd('/')
+    return "$prefix/$bucketName/$objectId"
+}
 
 @Composable
 fun WarrantyListScreen(
@@ -100,14 +112,22 @@ private fun androidx.compose.foundation.lazy.LazyListScope.warrantySection(
         items = items,
         key = { it.id ?: 0 },
     ) { warranty ->
+        val imageUrl =
+            warranty.imageObjectId?.let {
+                resolveMinioImageUrl(
+                    minioEndpoint = BuildKonfig.MINIO_ENDPOINT,
+                    bucketName = BuildKonfig.MINIO_BUCKET_NAME,
+                    objectId = it,
+                )
+            }
+
         WarrantyCard(
-            warranty = warranty,
-            onClick = {
-                warranty.id?.let(onEditClick)
-            },
-            onDelete = {
-                warranty.id?.let(onDeleteClick)
-            },
+            description = warranty.description,
+            purchaseDate = warranty.purchaseDate,
+            expiryDate = warranty.expiryDate,
+            imageUrl = imageUrl,
+            onEdit = { warranty.id?.let(onEditClick) },
+            onDelete = { warranty.id?.let(onDeleteClick) },
         )
     }
 }

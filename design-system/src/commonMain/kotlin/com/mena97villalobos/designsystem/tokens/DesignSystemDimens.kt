@@ -19,6 +19,8 @@ object DesignSystemDimens {
     val Radius10: Dp = 10.dp
     val Radius12: Dp = 12.dp
     val Radius16: Dp = 16.dp
+    val Radius20: Dp = 20.dp
+    val Radius24: Dp = 24.dp
     val Radius40: Dp = 40.dp
 
     val BorderWidth1_25: Dp = 1.25.dp
