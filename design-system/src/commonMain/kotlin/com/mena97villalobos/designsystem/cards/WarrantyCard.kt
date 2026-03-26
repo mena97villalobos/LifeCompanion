@@ -29,9 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.mena97villalobos.designsystem.PreviewDesignSystem
 import com.mena97villalobos.designsystem.progress.WarrantyHealthProgressBar
 import com.mena97villalobos.designsystem.theme.NegativeColor
 import com.mena97villalobos.designsystem.tokens.DesignSystemDimens
@@ -187,7 +187,7 @@ fun WarrantyCard(
     }
 }
 
-@Preview
+@PreviewDesignSystem
 @Composable
 private fun PreviewWarrantyCard() = MaterialTheme {
     val previewToday = Clock.System.todayIn(TimeZone.currentSystemDefault())
