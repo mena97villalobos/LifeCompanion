@@ -5,10 +5,5 @@ import com.mena97villalobos.remote.di.remoteModule
 import org.koin.dsl.module
 
 val appModule = module {
-    includes(
-        coroutinesModules,
-        localModule,
-        remoteModule,
-        viewModelModule,
-    )
+    includes(hostKoinModules(localModule, remoteModule))
 }

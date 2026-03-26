@@ -29,6 +29,10 @@ detektKtlint = "2.0.0-alpha.2"
 jetbrainsKotlinJvm = "2.3.20"
 composeMultiplatform = "1.10.3"
 buildkonfig = "0.17.1"
+# JetBrains multiplatform ports (Navigation 3 + lifecycle); align with composeMultiplatform releases
+jetbrainsNavigation3Ui = "1.1.0-alpha04"
+jetbrainsAdaptiveNavigation3 = "1.3.0-alpha06"
+jetbrainsLifecycleViewmodelCompose = "2.10.0-alpha08"
 
 [libraries]
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -79,11 +83,11 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 # Koin
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinBom" }
-koin-android = { module = "io.insert-koin:koin-android" }
-koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
-koin-compose = { module = "io.insert-koin:koin-compose" }
-koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
-koin-compose-navigation = { module = "io.insert-koin:koin-compose-navigation3" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinBom" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinBom" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinBom" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinBom" }
+koin-compose-navigation = { module = "io.insert-koin:koin-compose-navigation3", version.ref = "koinBom" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }
 koin-ktor-slf4j = { module = "io.insert-koin:koin-logger-slf4j" }
 koin-test = { module = "io.insert-koin:koin-test" }
@@ -107,6 +111,12 @@ firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 
 # Minio
 minio = { group = "io.minio", name = "minio", version.ref = "minio" }
+
+# Compose Multiplatform — Navigation 3 + adaptive + shared ViewModel (JetBrains AndroidX ports)
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "jetbrainsNavigation3Ui" }
+jetbrains-adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "jetbrainsAdaptiveNavigation3" }
+jetbrains-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycleViewmodelCompose" }
+jetbrains-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "jetbrainsLifecycleViewmodelCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

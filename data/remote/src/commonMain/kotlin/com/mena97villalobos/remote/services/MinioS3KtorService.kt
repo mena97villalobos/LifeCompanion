@@ -5,7 +5,6 @@ import com.mena97villalobos.domain.services.MinioService
 import com.mena97villalobos.remote.BuildKonfig
 import com.mena97villalobos.remote.crypto.PlatformCrypto
 import com.mena97villalobos.remote.crypto.toHexLower
-import com.mena97villalobos.remote.internal.epochMillis
 import com.mena97villalobos.remote.minio.AwsSigV4Signer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
@@ -14,10 +13,10 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
+import kotlin.time.Clock
 
 private const val MIME_JPEG = "image/jpeg"
 
@@ -83,7 +82,7 @@ private fun parseMinioEndpoint(): ParsedMinioEndpoint {
 
 @Suppress("DEPRECATION")
 private fun amzTimestamps(): Pair<String, String> {
-    val ldt = Instant.fromEpochMilliseconds(epochMillis()).toLocalDateTime(TimeZone.UTC)
+    val ldt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
     val y = ldt.year.toString().padStart(4, '0')
     val mo = ldt.monthNumber.toString().padStart(2, '0')
     val d = ldt.day.toString().padStart(2, '0')

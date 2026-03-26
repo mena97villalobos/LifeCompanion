@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "LifeCompanion"
 include(":app")
+include(":composeApp")
 include(":design-system")
 include(":data:local")
 include(":data:remote")
