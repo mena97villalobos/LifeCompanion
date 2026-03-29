@@ -7,6 +7,11 @@ plugins {
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
+dependencies {
+    // Compose previews tooling for AGP9 KMP Android target (see guide).
+    androidRuntimeClasspath(libs.jetbrains.compose.ui.tooling)
+}
+
 kotlin {
     iosArm64()
     iosSimulatorArm64()
@@ -53,7 +58,6 @@ kotlin {
             implementation(libs.coil.network.ktor3)
             // Coil network stack uses Ktor
             implementation(libs.ktor.core)
-            implementation(libs.jetbrains.compose.ui.tooling)
             implementation(libs.jetbrains.compose.ui.tooling.preview)
         }
 
