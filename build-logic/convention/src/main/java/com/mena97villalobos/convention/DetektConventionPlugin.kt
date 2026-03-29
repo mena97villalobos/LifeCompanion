@@ -52,19 +52,18 @@ class DetektConventionPlugin : Plugin<Project> {
                 val mergeTask = tasks.register<ReportMergeTask>("mergeDetektReports") {
                     output.set(layout.buildDirectory.file("reports/detekt/detekt-report.sarif"))
                 }
-                // After all projects are evaluated, wire everything safely
-                gradle.projectsEvaluated {
-                    subprojects.forEach { subproject ->
-                        subproject.plugins.withId("dev.detekt") {
-                            subproject.tasks.withType(Detekt::class.java).forEach { _ ->
-                                mergeTask.configure {
-                                    input.from(
-                                        subproject.layout.buildDirectory.file(
-                                            "reports/detekt/detekt.sarif",
-                                        ),
-                                    )
-                                }
-                            }
+                // Wire during configuration (not projectsEvaluated): late wiring breaks provider-based
+                // task dependencies under the configuration cache, so mergeDetektReports loses links to
+                // :module:detekt and Gradle reports implicit-dependency validation errors.
+                subprojects.forEach { subproject ->
+                    subproject.plugins.withId("dev.detekt") {
+                        mergeTask.configure {
+                            input.from(
+                                subproject.tasks.named("detekt", Detekt::class.java)
+                                    .flatMap { task ->
+                                        task.reports.sarif.outputLocation
+                                    },
+                            )
                         }
                     }
                 }

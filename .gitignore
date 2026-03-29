@@ -26,3 +26,4 @@ iosApp/LifeCompanion.xcodeproj/
 iosApp/**/*.xcworkspace/
 iosApp/**/xcuserdata/
 *.xcuserstate
+/app/release.keystore
