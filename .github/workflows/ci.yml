@@ -12,6 +12,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
   security-events: write
 
 env:
@@ -32,6 +33,12 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # Restores/saves ~/.gradle: dependency cache (caches/modules-2), wrapper dists, transforms, local build cache.
+          gradle-home-cache-includes: |
+            caches
+            notifications
+          cache-cleanup: on-success
 
       - name: Write gradle.properties (remote secrets)
         env:
@@ -49,7 +56,7 @@ jobs:
         run: ./gradlew detekt mergeDetektReports
 
       - name: Upload Detekt SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: build/reports/detekt/detekt-report.sarif
 
@@ -77,6 +84,11 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-includes: |
+            caches
+            notifications
+          cache-cleanup: on-success
 
       - name: Write gradle.properties (remote secrets)
         env:
@@ -114,6 +126,11 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-includes: |
+            caches
+            notifications
+          cache-cleanup: on-success
 
       - name: Write gradle.properties (remote secrets)
         env:
