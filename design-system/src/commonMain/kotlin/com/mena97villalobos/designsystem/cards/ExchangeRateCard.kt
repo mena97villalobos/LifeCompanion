@@ -1,7 +1,9 @@
 package com.mena97villalobos.designsystem.cards
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -23,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.mena97villalobos.designsystem.PreviewDesignSystem
 import com.mena97villalobos.designsystem.formatting.ExchangeRateFormatting
 import com.mena97villalobos.designsystem.theme.NegativeColor
 import com.mena97villalobos.designsystem.theme.PositiveColor
@@ -112,6 +116,28 @@ fun ExchangeRateCard(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@PreviewDesignSystem
+@Composable
+private fun ExchangeRatePreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            ExchangeRateCard(
+                currentExchangeRate = 515.42,
+                previousExchangeRate = 512.75,
+                indicatorLabel = "USD to CRC",
+            )
+            ExchangeRateCard(
+                currentExchangeRate = 510.10,
+                previousExchangeRate = 515.42,
+                indicatorLabel = "USD to CRC",
             )
         }
     }

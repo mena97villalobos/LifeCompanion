@@ -1,12 +1,17 @@
 package com.mena97villalobos.designsystem.button
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,11 +27,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.mena97villalobos.designsystem.PreviewDesignSystem
 import com.mena97villalobos.designsystem.core.TextColor
 import com.mena97villalobos.designsystem.core.conditional
 import com.mena97villalobos.designsystem.theme.Black30
 import com.mena97villalobos.designsystem.theme.Blue800
 import com.mena97villalobos.designsystem.theme.BrandPrimary
+import com.mena97villalobos.designsystem.theme.LifeCompanionTheme
 import com.mena97villalobos.designsystem.theme.typography
 import com.mena97villalobos.designsystem.tokens.DesignSystemDimens
 
@@ -279,4 +287,78 @@ data class ButtonIconInfo(
 enum class IconAlignment {
     START,
     END,
+}
+
+@PreviewDesignSystem
+@Composable
+private fun PreviewPrimaryButton() {
+    LifeCompanionTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            PrimaryButton(text = "Large", onClick = { }, modifier = Modifier.fillMaxWidth())
+            PrimaryButton(
+                text = "Large",
+                onClick = { },
+                modifier = Modifier.fillMaxWidth(),
+                buttonIconInfo = ButtonIconInfo(
+                    icon = Icons.Filled.Star,
+                    iconColor = Color.White,
+                    iconAlignment = IconAlignment.END,
+                ),
+            )
+            PrimaryButton(
+                text = "Large",
+                onClick = { },
+                modifier = Modifier.fillMaxWidth(),
+                buttonIconInfo = ButtonIconInfo(
+                    icon = Icons.Filled.Star,
+                    iconColor = Color.White,
+                    iconAlignment = IconAlignment.START,
+                ),
+            )
+            PrimaryButton(text = "Medium", onClick = { }, buttonStyle = ButtonStyle.MEDIUM)
+            PrimaryButton(text = "Small", onClick = { }, buttonStyle = ButtonStyle.SMALL)
+            PrimaryButton(text = "X Small", onClick = { }, buttonStyle = ButtonStyle.X_SMALL)
+        }
+    }
+}
+
+@PreviewDesignSystem
+@Composable
+private fun PreviewSecondaryButton() {
+    LifeCompanionTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            SecondaryButton(text = "Large", onClick = { }, modifier = Modifier.fillMaxWidth())
+            SecondaryButton(
+                text = "Large",
+                onClick = { },
+                modifier = Modifier.fillMaxWidth(),
+                buttonIconInfo = ButtonIconInfo(
+                    icon = Icons.Filled.Star,
+                    iconColor = Color.White,
+                    iconAlignment = IconAlignment.END,
+                ),
+            )
+            SecondaryButton(
+                text = "Large",
+                onClick = { },
+                modifier = Modifier.fillMaxWidth(),
+                buttonIconInfo = ButtonIconInfo(
+                    icon = Icons.Filled.Star,
+                    iconColor = Color.White,
+                    iconAlignment = IconAlignment.START,
+                ),
+            )
+            SecondaryButton(text = "Medium", onClick = { }, buttonStyle = ButtonStyle.MEDIUM)
+            SecondaryButton(text = "Small", onClick = { }, buttonStyle = ButtonStyle.SMALL)
+            SecondaryButton(text = "X Small", onClick = { }, buttonStyle = ButtonStyle.X_SMALL)
+        }
+    }
 }

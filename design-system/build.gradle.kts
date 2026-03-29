@@ -7,6 +7,11 @@ plugins {
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
+dependencies {
+    // Compose previews tooling for AGP9 KMP Android target (see guide).
+    androidRuntimeClasspath(libs.jetbrains.compose.ui.tooling)
+}
+
 kotlin {
     iosArm64()
     iosSimulatorArm64()
@@ -48,6 +53,12 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.materialIconsExtended)
             implementation(libs.kotlinx.datetime)
+            // Coil image loading (Compose Multiplatform)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
+            // Coil network stack uses Ktor
+            implementation(libs.ktor.core)
+            implementation(libs.jetbrains.compose.ui.tooling.preview)
         }
 
         androidMain.dependencies {
@@ -56,13 +67,12 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.material)
             implementation(libs.jetbrains.coroutines)
-            val composeVersion = libs.versions.composeMultiplatform.get()
-            implementation("org.jetbrains.compose.ui:ui-tooling:$composeVersion")
-            implementation("org.jetbrains.compose.ui:ui-tooling-preview:$composeVersion")
+            implementation(libs.ktor.okhttp)
         }
 
         iosMain.dependencies {
             // Foundation-backed formatters use platform APIs.
+            implementation(libs.ktor.darwin)
         }
 
         commonTest.dependencies {

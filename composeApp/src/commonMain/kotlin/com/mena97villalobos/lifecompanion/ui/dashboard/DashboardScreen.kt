@@ -69,11 +69,6 @@ private fun DashboardContent(state: DashboardStatus.Success) {
                 modifier = Modifier.width(responsiveCardWidth),
             )
         }
-
-        Text(
-            "Last updated: ${state.sellExchangeRate.date}",
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
 

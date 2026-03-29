@@ -23,6 +23,8 @@ val httpLoggingEnabled = findProperty("remote.http.logging")?.toString() == "tru
 
 buildkonfig {
     packageName = "com.mena97villalobos.remote"
+    // Make the generated constants accessible from other modules (e.g. Compose UI).
+    exposeObjectWithName = "BuildKonfig"
     defaultConfigs {
         buildConfigField(STRING, "EXCHANGE_API_ENDPOINT", exchangeBaseUrl)
         buildConfigField(STRING, "EXCHANGE_API_KEY", exchangeApiKey)
