@@ -1,0 +1,298 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  JAVA_VERSION: "17"
+
+jobs:
+  detekt:
+    name: detekt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Write gradle.properties (remote secrets)
+        env:
+          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
+          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
+        run: |
+          chmod +x ./scripts/ci/write-gradle-properties.sh
+          ./scripts/ci/write-gradle-properties.sh
+
+      - name: Run detekt
+        run: ./gradlew detekt mergeDetektReports
+
+      - name: Upload Detekt SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: build/reports/detekt/detekt-report.sarif
+
+      - name: Upload detekt reports (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-reports
+          path: |
+            **/build/reports/detekt/*.html
+            **/build/reports/detekt/*.sarif
+
+  android_pr:
+    name: android (PR debug)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Write gradle.properties (remote secrets)
+        env:
+          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
+          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
+        run: |
+          chmod +x ./scripts/ci/write-gradle-properties.sh
+          ./scripts/ci/write-gradle-properties.sh
+
+      - name: Build debug APK
+        run: ./gradlew :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+  android_release:
+    name: android (main release)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Write gradle.properties (remote secrets)
+        env:
+          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
+          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
+        run: |
+          chmod +x ./scripts/ci/write-gradle-properties.sh
+          ./scripts/ci/write-gradle-properties.sh
+
+      - name: Decode Android keystore
+        env:
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          test -n "$ANDROID_RELEASE_KEYSTORE_BASE64"
+          echo "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.keystore"
+
+      - name: Write Android signing properties
+        env:
+          ANDROID_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}
+          ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          mkdir -p "$HOME/.gradle"
+          {
+            echo "android.release.storeFile=$RUNNER_TEMP/release.keystore"
+            echo "android.release.storePassword=$ANDROID_RELEASE_KEYSTORE_PASSWORD"
+            echo "android.release.keyAlias=$ANDROID_RELEASE_KEY_ALIAS"
+            echo "android.release.keyPassword=$ANDROID_RELEASE_KEY_PASSWORD"
+          } >> "$HOME/.gradle/gradle.properties"
+
+      - name: Build release AAB
+        run: ./gradlew :app:bundleRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: app/build/outputs/bundle/release/*.aab
+
+      - name: Build release APK
+        run: ./gradlew :app:assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: app/build/outputs/apk/release/*.apk
+
+#  ios_ipa_firebase:
+#    name: iOS (main IPA + Firebase)
+#    runs-on: macos-latest
+#    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Set up JDK
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: temurin
+#          java-version: ${{ env.JAVA_VERSION }}
+#
+#      - name: Set up Gradle
+#        uses: gradle/actions/setup-gradle@v4
+#
+#      - name: Write gradle.properties (remote secrets)
+#        env:
+#          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
+#          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+#          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+#          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+#          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+#          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
+#        run: |
+#          chmod +x ./scripts/ci/write-gradle-properties.sh
+#          ./scripts/ci/write-gradle-properties.sh
+#
+#      - name: Install XcodeGen
+#        run: brew install xcodegen
+#
+#      - name: Generate Xcode project
+#        working-directory: iosApp
+#        run: xcodegen generate
+#
+#      - name: Build ComposeApp iOS framework (release, device)
+#        run: ./gradlew :composeApp:linkReleaseFrameworkIosArm64
+#
+#      - name: Import signing certificate
+#        env:
+#          IOS_P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
+#          IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+#        run: |
+#          test -n "$IOS_P12_BASE64"
+#          test -n "$IOS_P12_PASSWORD"
+#          CERT_PATH="$RUNNER_TEMP/ios_signing.p12"
+#          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+#          echo "$IOS_P12_BASE64" | base64 --decode > "$CERT_PATH"
+#          security create-keychain -p "" "$KEYCHAIN_PATH"
+#          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+#          security unlock-keychain -p "" "$KEYCHAIN_PATH"
+#          security import "$CERT_PATH" -P "$IOS_P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+#          security list-keychain -d user -s "$KEYCHAIN_PATH"
+#
+#      - name: Install provisioning profile
+#        env:
+#          IOS_MOBILEPROVISION_BASE64: ${{ secrets.IOS_MOBILEPROVISION_BASE64 }}
+#        run: |
+#          test -n "$IOS_MOBILEPROVISION_BASE64"
+#          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+#          echo "$IOS_MOBILEPROVISION_BASE64" | base64 --decode > "$PROFILE_PATH"
+#          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+#          UUID=$(security cms -D -i "$PROFILE_PATH" | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)
+#          cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+#
+#      - name: Archive iOS app
+#        env:
+#          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+#          IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+#          IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+#        run: |
+#          test -n "$IOS_TEAM_ID"
+#          test -n "$IOS_BUNDLE_ID"
+#          test -n "$IOS_PROVISIONING_PROFILE_NAME"
+#          xcodebuild \
+#            -project "iosApp/LifeCompanion.xcodeproj" \
+#            -scheme "LifeCompanion" \
+#            -configuration Release \
+#            -sdk iphoneos \
+#            -archivePath "$RUNNER_TEMP/LifeCompanion.xcarchive" \
+#            DEVELOPMENT_TEAM="$IOS_TEAM_ID" \
+#            CODE_SIGN_STYLE=Manual \
+#            PROVISIONING_PROFILE_SPECIFIER="$IOS_PROVISIONING_PROFILE_NAME" \
+#            archive
+#
+#      - name: Prepare ExportOptions.plist
+#        env:
+#          IOS_BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+#          IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+#        run: |
+#          test -n "$IOS_BUNDLE_ID"
+#          test -n "$IOS_PROVISIONING_PROFILE_NAME"
+#          EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
+#          cp "iosApp/ExportOptions.plist" "$EXPORT_PLIST"
+#          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" "$EXPORT_PLIST" || true
+#          /usr/libexec/PlistBuddy -c "Set :provisioningProfiles:$IOS_BUNDLE_ID $IOS_PROVISIONING_PROFILE_NAME" "$EXPORT_PLIST" || \
+#            /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:$IOS_BUNDLE_ID string $IOS_PROVISIONING_PROFILE_NAME" "$EXPORT_PLIST"
+#
+#      - name: Export IPA
+#        run: |
+#          xcodebuild -exportArchive \
+#            -archivePath "$RUNNER_TEMP/LifeCompanion.xcarchive" \
+#            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+#            -exportPath "$RUNNER_TEMP/export"
+#
+#      - name: Upload IPA
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: lifecompanion-ios-ipa
+#          path: ${{ runner.temp }}/export/*.ipa
+#
+#      - name: Set up Node
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: "20"
+#
+#      - name: Upload to Firebase App Distribution
+#        env:
+#          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+#          FIREBASE_IOS_APP_ID: ${{ secrets.FIREBASE_IOS_APP_ID }}
+#          FIREBASE_TESTER_GROUPS: ${{ secrets.FIREBASE_TESTER_GROUPS }}
+#        run: |
+#          test -n "$FIREBASE_TOKEN"
+#          test -n "$FIREBASE_IOS_APP_ID"
+#          IPA_PATH="$(ls -1 "$RUNNER_TEMP"/export/*.ipa | head -n 1)"
+#          npm i -g firebase-tools
+#          firebase appdistribution:distribute "$IPA_PATH" \
+#            --app "$FIREBASE_IOS_APP_ID" \
+#            ${FIREBASE_TESTER_GROUPS:+--groups "$FIREBASE_TESTER_GROUPS"} \
+#            --release-notes "CI build from $GITHUB_SHA"
