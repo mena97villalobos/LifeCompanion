@@ -51,6 +51,11 @@ jobs:
         run: |
           chmod +x ./scripts/ci/write-gradle-properties.sh
           ./scripts/ci/write-gradle-properties.sh
+      - name: Decode google-services.json
+        run: |
+          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Run detekt
         run: ./gradlew detekt mergeDetektReports
@@ -89,6 +94,12 @@ jobs:
             caches
             notifications
           cache-cleanup: on-success
+
+      - name: Decode google-services.json
+        run: |
+          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Write gradle.properties (remote secrets)
         env:
@@ -143,6 +154,12 @@ jobs:
         run: |
           chmod +x ./scripts/ci/write-gradle-properties.sh
           ./scripts/ci/write-gradle-properties.sh
+
+      - name: Decode google-services.json
+        run: |
+          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Decode Android keystore
         env:
