@@ -78,6 +78,12 @@ jobs:
           chmod +x ./scripts/ci/write-gradle-properties.sh
           ./scripts/ci/write-gradle-properties.sh
 
+      - name: Decode google-services.json
+        run: |
+          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+
       - name: Build Android (Gradle)
         if: matrix.language == 'java-kotlin'
         run: ./gradlew --no-configuration-cache :app:assembleDebug
