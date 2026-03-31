@@ -83,7 +83,7 @@ jobs:
         run: |
           set -euo pipefail
           ./gradlew --no-configuration-cache :composeApp:linkDebugFrameworkIosSimulatorArm64
-          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          arch -arm64 brew list xcodegen >/dev/null 2>&1 || arch -arm64 brew install xcodegen
           (cd iosApp && xcodegen generate)
           xcodebuild \
             -project "iosApp/LifeCompanion.xcodeproj" \
