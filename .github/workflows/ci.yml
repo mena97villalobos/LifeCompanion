@@ -25,37 +25,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up shared Gradle build environment
+        uses: ./.github/actions/setup-gradle-build-env
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          # Restores/saves ~/.gradle: dependency cache (caches/modules-2), wrapper dists, transforms, local build cache.
-          gradle-home-cache-includes: |
-            caches
-            notifications
-          cache-cleanup: on-success
-
-      - name: Write gradle.properties (remote secrets)
-        env:
-          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
-          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
-          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
-          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
-          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
-          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
-        run: |
-          chmod +x ./scripts/ci/write-gradle-properties.sh
-          ./scripts/ci/write-gradle-properties.sh
-      - name: Decode google-services.json
-        run: |
-          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
-        env:
-          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          exchange-base-url: ${{ secrets.EXCHANGE_BASE_URL }}
+          exchange-api-key: ${{ secrets.EXCHANGE_API_KEY }}
+          minio-endpoint: ${{ secrets.MINIO_ENDPOINT }}
+          minio-endpoint-access-key: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+          minio-endpoint-secret-key: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+          minio-bucket-name: ${{ secrets.MINIO_BUCKET_NAME }}
+          google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Run detekt
         run: ./gradlew detekt mergeDetektReports
@@ -81,37 +61,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up shared Gradle build environment
+        uses: ./.github/actions/setup-gradle-build-env
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-includes: |
-            caches
-            notifications
-          cache-cleanup: on-success
-
-      - name: Decode google-services.json
-        run: |
-          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
-        env:
-          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
-
-      - name: Write gradle.properties (remote secrets)
-        env:
-          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
-          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
-          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
-          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
-          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
-          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
-        run: |
-          chmod +x ./scripts/ci/write-gradle-properties.sh
-          ./scripts/ci/write-gradle-properties.sh
+          exchange-base-url: ${{ secrets.EXCHANGE_BASE_URL }}
+          exchange-api-key: ${{ secrets.EXCHANGE_API_KEY }}
+          minio-endpoint: ${{ secrets.MINIO_ENDPOINT }}
+          minio-endpoint-access-key: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+          minio-endpoint-secret-key: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+          minio-bucket-name: ${{ secrets.MINIO_BUCKET_NAME }}
+          google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug
@@ -129,37 +89,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up shared Gradle build environment
+        uses: ./.github/actions/setup-gradle-build-env
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-includes: |
-            caches
-            notifications
-          cache-cleanup: on-success
-
-      - name: Write gradle.properties (remote secrets)
-        env:
-          EXCHANGE_BASE_URL: ${{ secrets.EXCHANGE_BASE_URL }}
-          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
-          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
-          MINIO_ENDPOINT_ACCESS_KEY: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
-          MINIO_ENDPOINT_SECRET_KEY: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
-          MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
-        run: |
-          chmod +x ./scripts/ci/write-gradle-properties.sh
-          ./scripts/ci/write-gradle-properties.sh
-
-      - name: Decode google-services.json
-        run: |
-          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > app/google-services.json
-        env:
-          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          exchange-base-url: ${{ secrets.EXCHANGE_BASE_URL }}
+          exchange-api-key: ${{ secrets.EXCHANGE_API_KEY }}
+          minio-endpoint: ${{ secrets.MINIO_ENDPOINT }}
+          minio-endpoint-access-key: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
+          minio-endpoint-secret-key: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
+          minio-bucket-name: ${{ secrets.MINIO_BUCKET_NAME }}
+          google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Decode Android keystore
         env:

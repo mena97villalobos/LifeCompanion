@@ -1,0 +1,85 @@
+name: Setup Gradle Build Environment
+description: Set up Java, Gradle, remote Gradle properties, and optional Firebase config
+
+inputs:
+  java-version:
+    description: Java version to install
+    required: false
+    default: "17"
+  write-remote-gradle-properties:
+    description: Whether to write remote service Gradle properties
+    required: false
+    default: "true"
+  decode-google-services-json:
+    description: Whether to decode app/google-services.json
+    required: false
+    default: "true"
+  google-services-path:
+    description: Path to decoded google-services.json
+    required: false
+    default: app/google-services.json
+  exchange-base-url:
+    description: Exchange service base URL
+    required: false
+  exchange-api-key:
+    description: Exchange service API key
+    required: false
+  minio-endpoint:
+    description: MinIO endpoint
+    required: false
+  minio-endpoint-access-key:
+    description: MinIO access key
+    required: false
+  minio-endpoint-secret-key:
+    description: MinIO secret key
+    required: false
+  minio-bucket-name:
+    description: MinIO bucket name
+    required: false
+  google-services-json-base64:
+    description: Base64-encoded google-services.json
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Configure Gradle user home
+      shell: bash
+      run: echo "GRADLE_USER_HOME=${RUNNER_TEMP}/gradle-user-home" >> "$GITHUB_ENV"
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
+
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-home-cache-includes: |
+          caches
+          notifications
+        cache-cleanup: on-success
+
+    - name: Write gradle.properties (remote secrets)
+      if: ${{ inputs.write-remote-gradle-properties == 'true' }}
+      shell: bash
+      env:
+        EXCHANGE_BASE_URL: ${{ inputs.exchange-base-url }}
+        EXCHANGE_API_KEY: ${{ inputs.exchange-api-key }}
+        MINIO_ENDPOINT: ${{ inputs.minio-endpoint }}
+        MINIO_ENDPOINT_ACCESS_KEY: ${{ inputs.minio-endpoint-access-key }}
+        MINIO_ENDPOINT_SECRET_KEY: ${{ inputs.minio-endpoint-secret-key }}
+        MINIO_BUCKET_NAME: ${{ inputs.minio-bucket-name }}
+      run: |
+        chmod +x ./scripts/ci/write-gradle-properties.sh
+        ./scripts/ci/write-gradle-properties.sh
+
+    - name: Decode google-services.json
+      if: ${{ inputs.decode-google-services-json == 'true' }}
+      shell: bash
+      env:
+        GOOGLE_SERVICES_JSON_BASE64: ${{ inputs.google-services-json-base64 }}
+      run: |
+        mkdir -p "$(dirname "${{ inputs.google-services-path }}")"
+        echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > "${{ inputs.google-services-path }}"

@@ -12,6 +12,7 @@ settings:
   base:
     FRAMEWORK_SEARCH_PATHS: "$(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/debugFramework $(SRCROOT)/../composeApp/build/bin/iosArm64/debugFramework $(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/releaseFramework $(SRCROOT)/../composeApp/build/bin/iosArm64/releaseFramework"
     OTHER_LDFLAGS: "$(inherited) -framework ComposeApp"
+    EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
 targets:
   LifeCompanion:
     type: application
