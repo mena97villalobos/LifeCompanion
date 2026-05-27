@@ -71,6 +71,8 @@ jobs:
           minio-endpoint-access-key: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
           minio-endpoint-secret-key: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
           minio-bucket-name: ${{ secrets.MINIO_BUCKET_NAME }}
+          sentry-dsn: ${{ secrets.SENTRY_DSN }}
+          sentry-environment: development
           google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Build debug APK
@@ -99,6 +101,8 @@ jobs:
           minio-endpoint-access-key: ${{ secrets.MINIO_ENDPOINT_ACCESS_KEY }}
           minio-endpoint-secret-key: ${{ secrets.MINIO_ENDPOINT_SECRET_KEY }}
           minio-bucket-name: ${{ secrets.MINIO_BUCKET_NAME }}
+          sentry-dsn: ${{ secrets.SENTRY_DSN }}
+          sentry-environment: production
           google-services-json-base64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
 
       - name: Decode Android keystore

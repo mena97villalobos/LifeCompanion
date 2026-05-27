@@ -45,4 +45,13 @@ if [[ -n "${REMOTE_HTTP_LOGGING:-}" ]]; then
   append_prop "remote.http.logging" "${REMOTE_HTTP_LOGGING}"
 fi
 
+# Optional Sentry crash reporting config (:core:observability BuildKonfig).
+# Optional by design: builds without a DSN still succeed and crash reporting no-ops.
+if [[ -n "${SENTRY_DSN:-}" ]]; then
+  append_prop "sentry.dsn" "${SENTRY_DSN}"
+fi
+if [[ -n "${SENTRY_ENVIRONMENT:-}" ]]; then
+  append_prop "sentry.environment" "${SENTRY_ENVIRONMENT}"
+fi
+
 echo "Wrote Gradle properties to: $propsFile"
