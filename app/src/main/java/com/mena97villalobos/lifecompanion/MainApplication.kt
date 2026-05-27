@@ -13,7 +13,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Observability.init(isDebug = BuildConfig.DEBUG)
+        Observability.init(isDebug = BuildConfig.DEBUG, appVersion = BuildConfig.VERSION_NAME)
 
         startKoin {
             val logLevel = if (BuildConfig.DEBUG) Level.DEBUG else Level.NONE

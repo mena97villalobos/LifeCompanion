@@ -72,17 +72,18 @@ Log `loan $loanId`, not the loan's balance; log `user action started`, not the u
 
 ### Automatic redaction (safety net)
 
-In **release builds**, every log message is passed through `redact()` (see
-`PiiScrubbingLogWriter`) before reaching any sink — including Sentry — which masks:
+There are two layers, both masking email addresses → `[REDACTED_EMAIL]` and monetary amounts
+(₡/$ and CRC/USD) → `[REDACTED_AMOUNT]`:
 
-- email addresses → `[REDACTED_EMAIL]`
-- monetary amounts (₡/$ and CRC/USD) → `[REDACTED_AMOUNT]`
-
-In **debug builds** redaction is disabled so developers see full messages locally.
+1. **Log messages** — in **release builds**, every message is passed through `redact()` (see
+   `PiiScrubbingLogWriter`) before reaching any sink. In **debug builds** this is disabled so
+   developers see full messages locally (they stay on the device).
+2. **Anything transmitted to Sentry** — Sentry's `beforeSend` hook redacts the event message **and
+   each exception's message text** before transmission, in **every** build type (data leaving the
+   device must always be scrubbed). Stack frames are preserved, so crashes stay debuggable.
 
 Redaction is a backstop, **not** a substitute for the discipline above: names and other free-text
-PII cannot be detected automatically, and exception messages/stack traces are sent to Sentry
-unredacted — so never embed sensitive values in messages or exceptions.
+PII cannot be detected automatically — so never embed sensitive values in messages or exceptions.
 
 ---
 
@@ -118,10 +119,12 @@ IDs use the Kotlin stdlib `kotlin.uuid.Uuid` — no third-party dependency.
 - Crashes and `Error`/`Assert` logs are reported to Sentry on both platforms via the shared
   `CrashReporter`.
 - Every event is tagged with `build_type` (debug/release), `platform` (android/ios) and
-  `app_version`.
+  `app_version`. The app version is read at runtime from the platform (Android
+  `BuildConfig.VERSION_NAME`, iOS `CFBundleShortVersionString`) so it always matches the shipped
+  build.
 - The **DSN is never hardcoded**. It is injected at build time via `BuildKonfig` from the
   `sentry.dsn` Gradle property (set in `local.properties`, `~/.gradle/gradle.properties`, or a CI
-  secret). Related properties: `sentry.environment` (default `development`) and `app.versionName`.
+  secret). Related property: `sentry.environment` (default `development`).
 - When no DSN is configured (the default for local/dev builds), crash reporting is a no-op — logging
   still works normally.
 

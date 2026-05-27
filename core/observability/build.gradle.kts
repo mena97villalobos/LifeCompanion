@@ -9,9 +9,10 @@ plugins {
 
 // Optional project properties (gradle.properties / local.properties / CI -P flags).
 // SENTRY_DSN is intentionally blank by default so local/dev builds run without crash reporting.
+// The app version is NOT a build-time constant here — it is read at runtime from the platform
+// (Android BuildConfig.VERSION_NAME, iOS CFBundleShortVersionString) so it can never drift.
 val sentryDsn = (findProperty("sentry.dsn") as? String).orEmpty()
 val sentryEnvironment = (findProperty("sentry.environment") as? String) ?: "development"
-val appVersionName = (findProperty("app.versionName") as? String) ?: "1.0"
 
 buildkonfig {
     packageName = "com.mena97villalobos.observability"
@@ -20,7 +21,6 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(STRING, "SENTRY_DSN", sentryDsn)
         buildConfigField(STRING, "SENTRY_ENVIRONMENT", sentryEnvironment)
-        buildConfigField(STRING, "APP_VERSION", appVersionName)
     }
 }
 
@@ -69,8 +69,10 @@ kotlin {
         }
 
         commonTest.dependencies {
+            // Keep commonTest platform-agnostic: kotlin("test") maps to the right framework per
+            // target (JUnit on Android/JVM, the native test runner on iOS). JVM-only JUnit must not
+            // leak into commonTest or it breaks the iOS test compilation.
             implementation(kotlin("test"))
-            implementation(libs.junit)
         }
 
         getByName("androidDeviceTest") {

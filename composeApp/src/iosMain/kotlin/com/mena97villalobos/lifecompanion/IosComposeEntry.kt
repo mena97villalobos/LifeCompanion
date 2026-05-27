@@ -7,6 +7,7 @@ import com.mena97villalobos.observability.Observability
 import com.mena97villalobos.remote.di.iosRemoteModule
 import org.koin.core.context.startKoin
 import org.koin.core.error.KoinApplicationAlreadyStartedException
+import platform.Foundation.NSBundle
 import kotlin.native.Platform
 
 /**
@@ -14,7 +15,10 @@ import kotlin.native.Platform
  */
 @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
 fun initializeLifeCompanionKoinForIos() {
-    Observability.init(isDebug = Platform.isDebugBinary)
+    // Marketing version from Info.plist (CFBundleShortVersionString); matches the Android versionName.
+    val appVersion = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
+        ?: "unknown"
+    Observability.init(isDebug = Platform.isDebugBinary, appVersion = appVersion)
 
     runCatching {
         startKoin {
