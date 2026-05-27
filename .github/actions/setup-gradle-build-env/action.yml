@@ -36,6 +36,12 @@ inputs:
   minio-bucket-name:
     description: MinIO bucket name
     required: false
+  sentry-dsn:
+    description: Sentry DSN for crash reporting (optional; blank disables reporting)
+    required: false
+  sentry-environment:
+    description: Sentry environment tag (e.g. production, development)
+    required: false
   google-services-json-base64:
     description: Base64-encoded google-services.json
     required: false
@@ -71,6 +77,8 @@ runs:
         MINIO_ENDPOINT_ACCESS_KEY: ${{ inputs.minio-endpoint-access-key }}
         MINIO_ENDPOINT_SECRET_KEY: ${{ inputs.minio-endpoint-secret-key }}
         MINIO_BUCKET_NAME: ${{ inputs.minio-bucket-name }}
+        SENTRY_DSN: ${{ inputs.sentry-dsn }}
+        SENTRY_ENVIRONMENT: ${{ inputs.sentry-environment }}
       run: |
         chmod +x ./scripts/ci/write-gradle-properties.sh
         ./scripts/ci/write-gradle-properties.sh

@@ -57,6 +57,7 @@ kotlin {
             implementation(project(":domain"))
             implementation(project(":data:local"))
             implementation(project(":data:remote"))
+            implementation(project(":core:observability"))
 
             implementation(compose.runtime)
             implementation(compose.foundation)

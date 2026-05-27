@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.lifecompanion.detekt.plugin)
 }
 
@@ -72,6 +71,7 @@ dependencies {
     implementation(project(":composeApp"))
     implementation(project(":data:local"))
     implementation(project(":data:remote"))
+    implementation(project(":core:observability"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -90,7 +90,7 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.bundles.koin)
 
-    // Firebase
+    // Firebase (Analytics only; crash reporting handled by Sentry via :core:observability)
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
