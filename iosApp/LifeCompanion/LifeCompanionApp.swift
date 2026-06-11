@@ -4,7 +4,7 @@ import SwiftUI
 @main
 struct LifeCompanionApp: App {
     init() {
-        IosComposeEntryKt.initializeLifeCompanionKoinForIos()
+        IosComposeEntryKt.initializeLifeCompanionKoinForIos(argon2: Argon2Bridge())
     }
 
     var body: some Scene {

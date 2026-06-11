@@ -24,6 +24,8 @@
         <true />
         <key>NSPhotoLibraryUsageDescription</key>
         <string>Photo library access is used to attach warranty images.</string>
+        <key>NSFaceIDUsageDescription</key>
+        <string>Face ID is used to unlock LifeCompanion.</string>
         <key>UILaunchScreen</key>
         <dict />
         <key>UIApplicationSceneManifest</key>

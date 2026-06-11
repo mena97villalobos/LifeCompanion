@@ -59,6 +59,8 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.bundles.koin)
+            implementation(libs.androidx.security.crypto)
+            implementation(libs.argon2kt)
         }
 
         commonTest.dependencies {
