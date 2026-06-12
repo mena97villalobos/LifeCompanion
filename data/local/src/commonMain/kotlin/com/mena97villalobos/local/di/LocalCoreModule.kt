@@ -3,6 +3,7 @@ package com.mena97villalobos.local.di
 import com.mena97villalobos.domain.repository.AppLockRepository
 import com.mena97villalobos.domain.repository.ProfileRepository
 import com.mena97villalobos.domain.repository.WarrantyRepository
+import com.mena97villalobos.domain.security.AppLockAutoLocker
 import com.mena97villalobos.domain.security.AppLockManager
 import com.mena97villalobos.local.dao.UserProfileDao
 import com.mena97villalobos.local.dao.WarrantyDao
@@ -21,4 +22,6 @@ internal val localCoreModule = module {
     single<ProfileRepository> { ProfileRepositoryImpl(get()) }
     single<AppLockRepository> { AppLockRepositoryImpl(get(), get()) }
     single { AppLockManager(get()) }
+    // lifecycleObserver (AppLifecycleObserver) is bound in the host's platformSecurityModule.
+    single { AppLockAutoLocker(get(), get(), get()) }
 }

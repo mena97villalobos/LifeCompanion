@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +52,21 @@ fun SettingsScreen(
                 checked = state.biometricEnabled,
                 onCheckedChange = viewModel::onBiometricToggle,
                 enabled = state.biometricAvailable,
+            )
+        }
+
+        HorizontalDivider()
+
+        Column {
+            val minutes = state.inactivityTimeoutMinutes
+            Text("Auto-lock after inactivity: $minutes min")
+            Slider(
+                value = minutes.toFloat(),
+                onValueChange = { viewModel.onInactivityTimeoutChange(it.toInt()) },
+                onValueChangeFinished = { viewModel.onInactivityTimeoutCommit(minutes) },
+                valueRange = state.inactivityTimeoutRange.first.toFloat()..state.inactivityTimeoutRange.last.toFloat(),
+                steps = (state.inactivityTimeoutRange.last - state.inactivityTimeoutRange.first - 1).coerceAtLeast(0),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 

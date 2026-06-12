@@ -43,3 +43,29 @@ class IsPinSetUseCase(
 ) {
     suspend operator fun invoke(): Boolean = repository.isPinSet()
 }
+
+/** Reads the current inactivity auto-lock timeout, expressed in whole minutes for the UI. */
+class GetInactivityTimeoutUseCase(
+    private val repository: AppLockRepository,
+) {
+    suspend operator fun invoke(): Int =
+        (repository.getInactivityTimeoutMillis() / 60_000L).toInt()
+            .coerceIn(InactivityTimeout.MIN_MINUTES, InactivityTimeout.MAX_MINUTES)
+}
+
+/** Persists the inactivity auto-lock timeout (minutes), clamped to the allowed range. */
+class SetInactivityTimeoutUseCase(
+    private val repository: AppLockRepository,
+) {
+    suspend operator fun invoke(minutes: Int) {
+        val clamped = minutes.coerceIn(InactivityTimeout.MIN_MINUTES, InactivityTimeout.MAX_MINUTES)
+        repository.setInactivityTimeoutMillis(clamped * 60_000L)
+    }
+}
+
+/** Bounds for the user-configurable inactivity timeout (issue #8: 1–30 minutes, default 5). */
+object InactivityTimeout {
+    const val MIN_MINUTES = 1
+    const val MAX_MINUTES = 30
+    const val DEFAULT_MINUTES = 5
+}

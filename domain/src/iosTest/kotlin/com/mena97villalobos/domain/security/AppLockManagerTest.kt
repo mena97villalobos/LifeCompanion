@@ -14,7 +14,8 @@ import kotlin.test.assertTrue
  */
 class AppLockManagerTest {
 
-    private val config = BackoffConfig(failureThreshold = 3, baseDelayMillis = 30_000L, maxDelayMillis = 900_000L)
+    // Default schedule (issue #8): 1–3 immediate, 4 → 30s, 5 → 5min, 6+ → 15min.
+    private val config = BackoffConfig()
 
     @Test
     fun initializeUnconfiguredWhenNoPin() = runBlocking {
@@ -61,23 +62,26 @@ class AppLockManagerTest {
         val outcome = manager.submitPin("000000")
 
         assertIs<UnlockOutcome.Failed>(outcome)
-        assertEquals(2, outcome.remainingAttemptsBeforeLockout)
+        assertEquals(3, outcome.remainingAttemptsBeforeLockout)
         assertEquals(1, repo.failedAttempts)
     }
 
     @Test
-    fun thirdFailureTriggersLockout() = runBlocking {
+    fun fourthFailureTriggersLockout() = runBlocking {
         val repo = FakeAppLockRepository().apply { storedPin = "123456" }
         var now = 1_000L
         val manager = AppLockManager(repo, config) { now }
         manager.initialize()
 
-        manager.submitPin("000000")
-        manager.submitPin("000000")
-        val third = manager.submitPin("000000")
+        // First three failures stay immediate-retry; the fourth engages the 30s lockout.
+        repeat(3) {
+            val outcome = manager.submitPin("000000")
+            assertIs<UnlockOutcome.Failed>(outcome)
+        }
+        val fourth = manager.submitPin("000000")
 
-        assertIs<UnlockOutcome.LockedOut>(third)
-        assertEquals(30_000L, third.remainingMillis)
+        assertIs<UnlockOutcome.LockedOut>(fourth)
+        assertEquals(30_000L, fourth.remainingMillis)
         assertIs<AppLockState.LockedOut>(manager.state.value)
 
         // Even the correct PIN is rejected while locked out.
@@ -88,12 +92,28 @@ class AppLockManagerTest {
     }
 
     @Test
+    fun fifthFailureEscalatesToFiveMinutes() = runBlocking {
+        val repo = FakeAppLockRepository().apply { storedPin = "123456" }
+        var now = 1_000L
+        val manager = AppLockManager(repo, config) { now }
+        manager.initialize()
+
+        repeat(4) { manager.submitPin("000000") }
+        // Wait out the 30s lockout, then fail once more to reach the 5-minute tier.
+        now = 1_000L + 30_000L + 1L
+        val fifth = manager.submitPin("000000")
+
+        assertIs<UnlockOutcome.LockedOut>(fifth)
+        assertEquals(5 * 60_000L, fifth.remainingMillis)
+    }
+
+    @Test
     fun lockoutExpiresThenCorrectPinUnlocks() = runBlocking {
         val repo = FakeAppLockRepository().apply { storedPin = "123456" }
         var now = 1_000L
         val manager = AppLockManager(repo, config) { now }
         manager.initialize()
-        repeat(3) { manager.submitPin("000000") }
+        repeat(4) { manager.submitPin("000000") }
 
         now = 1_000L + 30_000L + 1L
         val outcome = manager.submitPin("123456")
