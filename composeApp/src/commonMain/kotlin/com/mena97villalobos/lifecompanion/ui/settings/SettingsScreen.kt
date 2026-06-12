@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mena97villalobos.lifecompanion.ui.settings.passphrase.PassphraseSettingsSection
 import org.koin.compose.viewmodel.koinViewModel
 
 /** App-lock settings: toggle biometric unlock and change the PIN (issue #7). */
@@ -100,5 +101,10 @@ fun SettingsScreen(
         }
 
         state.message?.let { Text(it) }
+
+        HorizontalDivider()
+
+        // Optional sensitive-operations passphrase (issue #9).
+        PassphraseSettingsSection()
     }
 }

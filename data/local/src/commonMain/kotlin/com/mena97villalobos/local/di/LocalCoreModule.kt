@@ -1,14 +1,17 @@
 package com.mena97villalobos.local.di
 
 import com.mena97villalobos.domain.repository.AppLockRepository
+import com.mena97villalobos.domain.repository.PassphraseRepository
 import com.mena97villalobos.domain.repository.ProfileRepository
 import com.mena97villalobos.domain.repository.WarrantyRepository
 import com.mena97villalobos.domain.security.AppLockAutoLocker
 import com.mena97villalobos.domain.security.AppLockManager
+import com.mena97villalobos.domain.security.PassphraseManager
 import com.mena97villalobos.local.dao.UserProfileDao
 import com.mena97villalobos.local.dao.WarrantyDao
 import com.mena97villalobos.local.database.LifeCompanionDatabase
 import com.mena97villalobos.local.repository.AppLockRepositoryImpl
+import com.mena97villalobos.local.repository.PassphraseRepositoryImpl
 import com.mena97villalobos.local.repository.ProfileRepositoryImpl
 import com.mena97villalobos.local.repository.WarrantyRepositoryImpl
 import org.koin.dsl.module
@@ -24,4 +27,8 @@ internal val localCoreModule = module {
     single { AppLockManager(get()) }
     // lifecycleObserver (AppLifecycleObserver) is bound in the host's platformSecurityModule.
     single { AppLockAutoLocker(get(), get(), get()) }
+
+    // Sensitive-operations passphrase (issue #9): reuses the Argon2id PinHasher and SecureStorage.
+    single<PassphraseRepository> { PassphraseRepositoryImpl(get(), get()) }
+    single { PassphraseManager(get()) }
 }
