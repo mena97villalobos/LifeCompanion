@@ -1,7 +1,9 @@
 package com.mena97villalobos.local.di
 
+import com.mena97villalobos.domain.usecases.GetInactivityTimeoutUseCase
 import com.mena97villalobos.domain.usecases.GetProfileUseCase
 import com.mena97villalobos.domain.usecases.IsPinSetUseCase
+import com.mena97villalobos.domain.usecases.SetInactivityTimeoutUseCase
 import com.mena97villalobos.domain.usecases.ObserveBiometricEnabledUseCase
 import com.mena97villalobos.domain.usecases.ObserveProfileUseCase
 import com.mena97villalobos.domain.usecases.SaveProfileUseCase
@@ -22,4 +24,6 @@ val profileUseCaseModule = module {
     factory { SetBiometricEnabledUseCase(get()) }
     factory { ObserveBiometricEnabledUseCase(get()) }
     factory { IsPinSetUseCase(get()) }
+    factory { GetInactivityTimeoutUseCase(get()) }
+    factory { SetInactivityTimeoutUseCase(get()) }
 }

@@ -28,7 +28,7 @@ val viewModelModule = module {
     }
 
     // App lock + onboarding (issue #7)
-    viewModel { RootViewModel(observeProfile = get(), appLockManager = get()) }
+    viewModel { RootViewModel(observeProfile = get(), appLockManager = get(), autoLocker = get()) }
     viewModel {
         OnboardingViewModel(
             saveProfile = get(),
@@ -50,6 +50,8 @@ val viewModelModule = module {
             observeBiometricEnabled = get(),
             setBiometricEnabled = get(),
             setupPin = get(),
+            getInactivityTimeout = get(),
+            setInactivityTimeout = get(),
             biometricAuthenticator = get(),
         )
     }

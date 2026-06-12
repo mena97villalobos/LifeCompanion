@@ -1,37 +1,55 @@
 package com.mena97villalobos.domain.security
 
 /**
- * Exponential-backoff parameters for repeated PIN failures.
+ * Lockout schedule applied after repeated PIN failures (issue #8, BRD §6.1 FR-07).
  *
- * No lockout applies until [failureThreshold] consecutive failures. From then on each additional
- * failure doubles the lockout, starting at [baseDelayMillis] and capped at [maxDelayMillis].
+ * The schedule is a stepped table rather than a smooth curve so it can match the product spec
+ * exactly:
+ *
+ * - 1–3 failures: no lockout (immediate retry)
+ * - 4 failures: 30 seconds
+ * - 5 failures: 5 minutes
+ * - 6+ failures: 15 minutes
+ *
+ * [tiers] must be sorted by strictly ascending [BackoffTier.failuresAtLeast]; the lockout for a
+ * given failure count is the highest tier whose threshold has been reached.
  */
 data class BackoffConfig(
-    val failureThreshold: Int = 3,
-    val baseDelayMillis: Long = 30_000L,
-    val maxDelayMillis: Long = 15 * 60_000L,
+    val tiers: List<BackoffTier> = DEFAULT_TIERS,
 ) {
     init {
-        require(failureThreshold >= 1) { "failureThreshold must be >= 1" }
-        require(baseDelayMillis >= 0) { "baseDelayMillis must be >= 0" }
-        require(maxDelayMillis >= baseDelayMillis) { "maxDelayMillis must be >= baseDelayMillis" }
+        require(tiers.isNotEmpty()) { "tiers must not be empty" }
+        require(tiers.zipWithNext().all { (lower, higher) -> higher.failuresAtLeast > lower.failuresAtLeast }) {
+            "tiers must be sorted by strictly ascending failuresAtLeast"
+        }
+    }
+
+    /** The number of consecutive failures at which the first lockout engages. */
+    val firstLockoutAt: Int get() = tiers.first().failuresAtLeast
+
+    companion object {
+        val DEFAULT_TIERS: List<BackoffTier> = listOf(
+            BackoffTier(failuresAtLeast = 4, lockoutMillis = 30_000L),
+            BackoffTier(failuresAtLeast = 5, lockoutMillis = 5 * 60_000L),
+            BackoffTier(failuresAtLeast = 6, lockoutMillis = 15 * 60_000L),
+        )
+    }
+}
+
+/** A single step of the [BackoffConfig] schedule: at [failuresAtLeast] failures, wait [lockoutMillis]. */
+data class BackoffTier(
+    val failuresAtLeast: Int,
+    val lockoutMillis: Long,
+) {
+    init {
+        require(failuresAtLeast >= 1) { "failuresAtLeast must be >= 1" }
+        require(lockoutMillis >= 0) { "lockoutMillis must be >= 0" }
     }
 }
 
 /**
- * Lockout duration for [failedAttempts] consecutive failures.
- *
- * Returns 0 below the threshold. At the threshold it returns [BackoffConfig.baseDelayMillis], then
- * doubles per extra failure, saturating at [BackoffConfig.maxDelayMillis]. The doubling is computed
- * without overflow: once it would exceed the cap it returns the cap directly.
+ * Lockout duration for [failedAttempts] consecutive failures: the [BackoffTier.lockoutMillis] of the
+ * highest tier whose [BackoffTier.failuresAtLeast] has been reached, or 0 below the first tier.
  */
-fun lockoutDurationMillis(failedAttempts: Int, config: BackoffConfig): Long {
-    if (failedAttempts < config.failureThreshold) return 0L
-    val exponent = failedAttempts - config.failureThreshold
-    var duration = config.baseDelayMillis
-    repeat(exponent) {
-        if (duration >= config.maxDelayMillis) return config.maxDelayMillis
-        duration *= 2
-    }
-    return duration.coerceAtMost(config.maxDelayMillis)
-}
+fun lockoutDurationMillis(failedAttempts: Int, config: BackoffConfig): Long =
+    config.tiers.lastOrNull { failedAttempts >= it.failuresAtLeast }?.lockoutMillis ?: 0L

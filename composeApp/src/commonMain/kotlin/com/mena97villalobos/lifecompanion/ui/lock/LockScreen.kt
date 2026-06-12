@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -86,5 +88,26 @@ fun LockScreen(
                 Text("Use biometrics")
             }
         }
+
+        TextButton(onClick = viewModel::onForgotPin) {
+            Text("Forgot PIN?")
+        }
+    }
+
+    if (state.showForgotPin) {
+        AlertDialog(
+            onDismissRequest = viewModel::dismissForgotPin,
+            title = { Text("Forgot PIN?") },
+            text = {
+                Text(
+                    "Your PIN can't be retrieved — it's never stored, only a secure hash is kept. " +
+                        "You'll be able to reset it using your recovery phrase. Recovery is coming in a " +
+                        "later update.",
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = viewModel::dismissForgotPin) { Text("Got it") }
+            },
+        )
     }
 }

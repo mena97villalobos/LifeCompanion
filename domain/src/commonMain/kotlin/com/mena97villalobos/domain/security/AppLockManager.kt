@@ -103,7 +103,7 @@ class AppLockManager(
 
     private suspend fun remainingAttemptsBeforeLockout(): Int? {
         val failures = repository.getFailedAttempts()
-        val left = config.failureThreshold - failures
+        val left = config.firstLockoutAt - failures
         return if (left > 0) left else null
     }
 }

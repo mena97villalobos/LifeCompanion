@@ -3,6 +3,7 @@ package com.mena97villalobos.lifecompanion.ui.root
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mena97villalobos.domain.model.AppLockState
+import com.mena97villalobos.domain.security.AppLockAutoLocker
 import com.mena97villalobos.domain.security.AppLockManager
 import com.mena97villalobos.domain.usecases.ObserveProfileUseCase
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +29,7 @@ sealed interface RootUiState {
 class RootViewModel(
     observeProfile: ObserveProfileUseCase,
     private val appLockManager: AppLockManager,
+    private val autoLocker: AppLockAutoLocker,
 ) : ViewModel() {
 
     val uiState: StateFlow<RootUiState> =
@@ -42,6 +44,8 @@ class RootViewModel(
 
     init {
         viewModelScope.launch { appLockManager.initialize() }
+        // Observe app foreground/background for as long as the app is alive to drive inactivity lock.
+        viewModelScope.launch { autoLocker.observe() }
     }
 
     /** Re-engage the lock (e.g. on backgrounding or inactivity timeout). */

@@ -22,6 +22,7 @@ data class LockUiState(
     val biometricEnabled: Boolean = false,
     val biometricAvailable: Boolean = false,
     val isVerifying: Boolean = false,
+    val showForgotPin: Boolean = false,
 ) {
     val isLockedOut: Boolean get() = lockState is AppLockState.LockedOut
     val lockoutRemainingMillis: Long get() = (lockState as? AppLockState.LockedOut)?.remainingMillis ?: 0L
@@ -77,6 +78,10 @@ class LockViewModel(
     fun refreshLockout() {
         viewModelScope.launch { appLockManager.refreshLockout() }
     }
+
+    fun onForgotPin() = _uiState.update { it.copy(showForgotPin = true) }
+
+    fun dismissForgotPin() = _uiState.update { it.copy(showForgotPin = false) }
 
     fun authenticateWithBiometric() {
         if (!_uiState.value.canOfferBiometric) return

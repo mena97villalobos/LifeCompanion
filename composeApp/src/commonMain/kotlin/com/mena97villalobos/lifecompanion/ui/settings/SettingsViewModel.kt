@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.mena97villalobos.domain.security.BiometricAuthenticator
 import com.mena97villalobos.domain.security.BiometricAvailability
 import com.mena97villalobos.domain.security.BiometricResult
+import com.mena97villalobos.domain.usecases.GetInactivityTimeoutUseCase
+import com.mena97villalobos.domain.usecases.InactivityTimeout
 import com.mena97villalobos.domain.usecases.ObserveBiometricEnabledUseCase
 import com.mena97villalobos.domain.usecases.SetBiometricEnabledUseCase
+import com.mena97villalobos.domain.usecases.SetInactivityTimeoutUseCase
 import com.mena97villalobos.domain.usecases.SetupPinUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +21,14 @@ data class SettingsUiState(
     val biometricAvailable: Boolean = false,
     val changePinValue: String = "",
     val confirmPinValue: String = "",
+    val inactivityTimeoutMinutes: Int = InactivityTimeout.DEFAULT_MINUTES,
     val message: String? = null,
 ) {
     val canSavePin: Boolean
         get() = SetupPinUseCase.isValidPin(changePinValue) && changePinValue == confirmPinValue
+
+    val inactivityTimeoutRange: IntRange
+        get() = InactivityTimeout.MIN_MINUTES..InactivityTimeout.MAX_MINUTES
 }
 
 /**
@@ -33,6 +40,8 @@ class SettingsViewModel(
     observeBiometricEnabled: ObserveBiometricEnabledUseCase,
     private val setBiometricEnabled: SetBiometricEnabledUseCase,
     private val setupPin: SetupPinUseCase,
+    private val getInactivityTimeout: GetInactivityTimeoutUseCase,
+    private val setInactivityTimeout: SetInactivityTimeoutUseCase,
     private val biometricAuthenticator: BiometricAuthenticator,
 ) : ViewModel() {
 
@@ -47,6 +56,21 @@ class SettingsViewModel(
         viewModelScope.launch {
             observeBiometricEnabled().collect { enabled -> _uiState.update { it.copy(biometricEnabled = enabled) } }
         }
+        viewModelScope.launch {
+            val minutes = getInactivityTimeout()
+            _uiState.update { it.copy(inactivityTimeoutMinutes = minutes) }
+        }
+    }
+
+    /** Updates the UI immediately while the user drags the slider (not yet persisted). */
+    fun onInactivityTimeoutChange(minutes: Int) =
+        _uiState.update { it.copy(inactivityTimeoutMinutes = minutes.coerceIn(it.inactivityTimeoutRange)) }
+
+    /** Persists the chosen timeout once the user finishes adjusting the slider. */
+    fun onInactivityTimeoutCommit(minutes: Int) {
+        val clamped = minutes.coerceIn(_uiState.value.inactivityTimeoutRange)
+        _uiState.update { it.copy(inactivityTimeoutMinutes = clamped) }
+        viewModelScope.launch { setInactivityTimeout(clamped) }
     }
 
     fun onBiometricToggle(enabled: Boolean) {

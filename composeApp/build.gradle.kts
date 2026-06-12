@@ -85,6 +85,7 @@ kotlin {
             implementation(libs.jetbrains.coroutines)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.biometric)
+            implementation(libs.androidx.lifecycle.process)
         }
 
         iosMain.dependencies {
