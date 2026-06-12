@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.material)
     implementation(libs.androidx.activity.compose)
+    // FragmentActivity host required by BiometricPrompt (app lock, issue #7)
+    implementation(libs.androidx.biometric)
 
     // Compose (shell only; shared UI lives in :composeApp)
     implementation(platform(libs.androidx.compose.bom))

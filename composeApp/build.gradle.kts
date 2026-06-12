@@ -83,6 +83,8 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.jetbrains.coroutines)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.biometric)
         }
 
         iosMain.dependencies {

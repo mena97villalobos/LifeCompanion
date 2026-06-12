@@ -1,12 +1,11 @@
 package com.mena97villalobos.domain
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * Example unit test executed on every target (`kotlin.test`, so it compiles for Android host and the
+ * iOS simulator alike).
  */
 class ExampleUnitTest {
     @Test

@@ -14,6 +14,10 @@ packages:
   Sentry:
     url: https://github.com/getsentry/sentry-cocoa
     exactVersion: 8.38.0
+  # Argon2id PIN hashing for app lock (issue #7); bridged into Kotlin via the IosArgon2 interface.
+  Argon2Swift:
+    url: https://github.com/tmthecoder/Argon2Swift
+    from: 1.0.0
 settings:
   base:
     FRAMEWORK_SEARCH_PATHS: "$(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/debugFramework $(SRCROOT)/../composeApp/build/bin/iosArm64/debugFramework $(SRCROOT)/../composeApp/build/bin/iosSimulatorArm64/releaseFramework $(SRCROOT)/../composeApp/build/bin/iosArm64/releaseFramework"
@@ -28,6 +32,8 @@ targets:
     dependencies:
       - package: Sentry
         product: Sentry
+      - package: Argon2Swift
+        product: Argon2Swift
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.mena97villalobos.lifecompanion.ios
       INFOPLIST_FILE: LifeCompanion/Info.plist
