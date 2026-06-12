@@ -5,6 +5,7 @@ import com.mena97villalobos.lifecompanion.ui.lock.LockViewModel
 import com.mena97villalobos.lifecompanion.ui.onboarding.OnboardingViewModel
 import com.mena97villalobos.lifecompanion.ui.root.RootViewModel
 import com.mena97villalobos.lifecompanion.ui.settings.SettingsViewModel
+import com.mena97villalobos.lifecompanion.ui.settings.passphrase.PassphraseSettingsViewModel
 import com.mena97villalobos.lifecompanion.ui.warranty.add.AddEditWarrantyViewModel
 import com.mena97villalobos.lifecompanion.ui.warranty.list.WarrantyListViewModel
 import org.koin.core.module.dsl.viewModel
@@ -53,6 +54,14 @@ val viewModelModule = module {
             getInactivityTimeout = get(),
             setInactivityTimeout = get(),
             biometricAuthenticator = get(),
+        )
+    }
+    viewModel {
+        PassphraseSettingsViewModel(
+            observePassphraseEnabled = get(),
+            enablePassphrase = get(),
+            disablePassphrase = get(),
+            changePassphrase = get(),
         )
     }
 }
